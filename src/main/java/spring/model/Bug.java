@@ -2,14 +2,13 @@ package spring.model;
 
 import java.util.List;
 
-public class Fish {
+public class Bug {
     private String index;
     private String name;
     private List<Integer> northernMonths;
     private List<Integer> southernMonths;
-    private String time;
     private String price;
-    private String size;
+    private String time;
     private String location;
 
     public String getIndex() {
@@ -60,14 +59,6 @@ public class Fish {
 
     public void setPrice(String price) {
         this.price = price;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
     }
 
     public String getLocation() {

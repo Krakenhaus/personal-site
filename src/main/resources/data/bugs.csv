@@ -1,0 +1,81 @@
+index,name,location,value,time,northern,southern
+1,Common Butterfly,Flying,160,4 a.m. - 7 p.m.,September-June,March-December
+2,Yellow Butterfly,Flying,160,4 a.m. - 7 p.m.,March-June|September-October,March-April|September-December
+3,Tiger Butterfly,Flying,240,4 a.m. - 7 p.m.,March-September,September-March
+4,Peacock Butterfly,Flying,2500,4 a.m. - 7 p.m.,March-June,September-December
+5,Common Bluebottle,Flying,300,4 a.m. - 7 p.m.,April-August,October-February
+6,Paper Kite Butterfly,Flying,1000,8 a.m. - 7 p.m.,All,All
+7,Great Purple Emperor,Flying,3000,4 a.m. - 7 p.m.,May-August,December-March
+8,Monach Butterfly,Flying,140,4 a.m. - 5 p.m.,September-November,March-May
+9,Emperor Butterfly,Flying,4000,5 p.m. - 8 a.m.,June-September|December-March,December-March|June-September
+10,Agrias Butterfly,Flying,3000,8 a.m. - 5 p.m.,April-September,November-March
+11,Raja Brooke's Birdwing,Flying,2500,8 a.m. - 5 p.m.,April-September|December-February,November-March|June-August
+12,Queen Alexandra's Birdwing,Flying,4000,8 a.m. - 4 p.m.,May-September,November-March
+13,Moth,Flying by light,130,7 p.m. - 4 a.m.,All,All
+14,Atlas Moth,On trees,3000,7 p.m. - 4 a.m.,April-September,October-March
+15,Madagascan Sunset Moth,Flying,2500,8 a.m. - 4 p.m.,April-September,October-March
+16,Long Locust,On ground,200,8 a.m. - 7 p.m.,April-November,November-May
+17,Migratory Locust,On ground,600,8 a.m. - 7 p.m.,August-November,February-May
+18,Rice Grasshopper,On ground,160,8 a.m. - 7 p.m.,August-November,February-May
+19,Grasshopper,On ground,160,8 a.m. - 5 p.m.,July-September,January-March
+20,Cricket,Dig at cricket noise,130,5 p.m. - 8 a.m.,September-November,March-May
+21,Bell Cricket,On ground,430,5 p.m. - 8 a.m.,September-October,March-April
+22,Mantis,On flowers,430,8 a.m. - 5 p.m.,March-November,September-May
+23,Orchid Mantis,On white flowers,2400,8 a.m. - 5 p.m.,March-November,September-May
+24,Honeybee,Flying,200,8 a.m. - 5 p.m.,March-July,March-July
+25,Wasp,Falls from shaking trees,2500,All day,All,All
+26,Brown Cicada,On trees,?,8 a.m. - 5 p.m.,July-August,January-February
+27,Robust Cicada,On trees,?,8 a.m. - 5 p.m.,July-August,January-February
+28,Giant Cicada,On trees,?,8 a.m. - 5 p.m.,July-August,January-February
+29,Walker Cicada,On trees,400,8 a.m. - 5 p.m.,August-September,February-March
+30,Evening Cicada,On trees,?,4 a.m. - 8 a.m. 4 p.m. - 7 p.m.,July-August,January-February
+31,Cicada Shell,On trees,?,All day,July-August,January-February
+32,Red Dragonfly,Flying,180,8 a.m. - 7 p.m.,September-October,March-April
+33,Darner Dragonfly,Flying,230,8 a.m. - 5 p.m.,April-October,October-April
+34,Banded Dragonfly,Flying,4500,8 a.m. - 5 p.m.,May-October,November-April
+35,Damselfly,Flying,?,All day,November-February,May-August
+36,Firefly,Flying,?,7 p.m. - 4 a.m.,June,December
+37,Mole Cricket,Underground,500,All day,November-May,May-November
+38,Pondskater,Ponds,130,8 a.m. - 7 p.m.,May-September,November-March
+39,Diving Beetle,Ponds and rivers,800,8 a.m. - 7 p.m.,May-September,November-March
+40,Giant Water Bug,Ponds and rivers,2000,7 p.m. - 8 a.m.,April-September,October-March
+41,Stinkbug,On flowers,120,All day,March-November,September-May
+42,Man-faced Stink Bug,On flowers,1000,7 p.m. - 8 a.m.,March-November,September-May
+43,Ladybug,On flowers,200,8 a.m. - 5 p.m.,March-June|October,September-December|April
+44,Tiger Beetle,On ground,1500,All day,February-November,August-May
+45,Jewel Beetle,On trees,2400,All day,April-August,October-February
+46,Violin Beetle,On tree stumps,450,All day,May-June|September-November,November-December|March-April
+47,Citrus Long-horned Beetle,On tree stumps,350,All day,All,All
+48,Rosalia Batesi Beetle,On tree stumps,3000,All day,May-September,November-March
+49,Blue Weevil Beetle,,?,All day,July-August,January-February
+50,Dung Beetle,Pushing snowballs,,,December-February,June-August
+51,Earth-boring Dung Beetle,On ground,300,All day,July-September,January-March
+52,Scarab Beetle,On trees,?,11 p.m. - 8 a.m.,July-August,January-February
+53,Drone Beetle,On trees,?,All day,June-August,December-February
+54,Goliath Beetle,On trees,8000,5 p.m. - 8 a.m.,June-September,December-March
+55,Saw Stag,On trees,?,All day,July-August,January-February
+56,Miyama Stag,On trees,?,All day,July-August,January-February
+57,Giant Stag,On trees,?,11 p.m. - 8 a.m.,July-August,January-February
+58,Rainbow Stag,On trees,6000,7 p.m. - 8 a.m.,June-September,December-March
+59,Cyclommatus Stag,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
+60,Golden Stag,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
+61,Giraffe Stag,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
+62,Horned Dynastid,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
+63,Horned Atlas,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
+64,Horned Elephant,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
+65,Horned Herucles,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
+66,Walking Stick,Falls from shaking trees,?,4 a.m. - 8 a.m. 5 p.m. - 7 p.m.,July-November,January-May
+67,Walking Leaf,Near trees disguised as furniture leaf,600,All day,July-August,January-March
+68,Bagworm,Falls from shaking trees,600,All day,All,All
+69,Ant,On rotten food,?,All day,All,All
+70,Hermit Crab,Beach,1000,7 p.m. - 8 a.m.,All,All
+71,Wharf Roach,On rocks at beach,200,All day,All,All
+72,Fly,On trash items,?,All day,All,All
+73,Mosquito,Flying,130,5 p.m. - 4 a.m.,June-September,December-March
+74,Flea,On villagers,?,All day,April-November,October-May
+75,Snail,On rocks (raining),250,All day,All,All
+76,Pill Bug,Hit rocks,250,11 p.m. - 4 p.m.,September-June,March-December
+77,Centipede,Hit rocks,300,4 p.m. - 11 p.m.,September-June,March-December
+78,Spider,Falls from shaking trees,480,7 p.m. - 8 a.m.,All,All
+79,Tarantula,On ground,8000,7 p.m. - 4 a.m.,November-April,May-October
+80,Scorpion,On ground,8000,7 p.m. - 4 a.m.,May-October,November-April
