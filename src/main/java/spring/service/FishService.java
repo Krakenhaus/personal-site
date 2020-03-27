@@ -36,6 +36,7 @@ public class FishService {
                 fish.setIndex(fields[0]);
                 fish.setName(fields[1]);
                 fish.setNorthernMonths(getNorthernMonths(fields[6]));
+                fish.setTime(fields[5]);
                 fishies.add(fish);
             }
         } catch (IOException e) {
