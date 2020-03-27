@@ -3,13 +3,13 @@ import {
   Grid,
   LinearProgress,
 } from '@material-ui/core';
-import Fish from './Fish';
+import Creature from './Creature';
 
-const storageKey = 'greg-acnh-fish';
-class Fishies extends Component {
+const storageKey = type => `greg-acnh-${type}`;
+class Creatures extends Component {
   state = {
     isLoading: true,
-    fishies: []
+    creatures: []
   };
 
   constructor(props) {
@@ -19,35 +19,38 @@ class Fishies extends Component {
   }
 
   async componentDidMount() {
-    const response = await fetch('/fish');
-    let fishies = await response.json();
-    fishies = fishies.sort((a, b) => {
+    const { type } = this.props;
+    const response = await fetch(`/${type}`);
+    let creatures = await response.json();
+    creatures = creatures.sort((a, b) => {
       // Use toUpperCase() to ignore character casing
-      const fishA = a.name.toUpperCase();
-      const fishB = b.name.toUpperCase();
+      const creatureA = a.name.toUpperCase();
+      const creatureB = b.name.toUpperCase();
 
       let comparison = 0;
-      if (fishA > fishB) {
+      if (creatureA > creatureB) {
         comparison = 1;
-      } else if (fishA < fishB) {
+      } else if (creatureA < creatureB) {
         comparison = -1;
       }
       return comparison;
     });
-    this.setState({ fishies });
+    this.setState({ creatures });
     this.mergeSavedData();
   }
 
   getSavedData() {
+    const { type } = this.props;
     const localStorage = window && window.localStorage;
     if (localStorage) {
-      return JSON.parse(localStorage.getItem(storageKey)) || {};
+      return JSON.parse(localStorage.getItem(storageKey(type))) || {};
     }
     // No LocalStorage, so nothing will work
     return {};
   }
 
   toggleAccumulation(e, prop) {
+    const { type } = this.props;
     const id = e.target.parentNode.parentNode.dataset.id;
     const savedData = this.getSavedData();
     if (savedData[id]) {
@@ -56,49 +59,50 @@ class Fishies extends Component {
       savedData[id] = {}
       savedData[id][prop] = true;
     }
-    localStorage.setItem(storageKey,  JSON.stringify(savedData));
+    localStorage.setItem(storageKey(type),  JSON.stringify(savedData));
     this.mergeSavedData();
   }
 
   mergeSavedData()
   {
-    const { fishies } = this.state;
+    const { creatures } = this.state;
     const savedData = this.getSavedData();
 
-    const newFishies = fishies.map((fish) => {
-      const container = fish;
-      const savedFishData = savedData[fish.index];
-      if (savedFishData)
+    const newCreatures = creatures.map((creature) => {
+      const container = creature;
+      const savedCreatureData = savedData[creature.index];
+      if (savedCreatureData)
       {
-        container.isDonated = savedFishData.isDonated;
-        container.isHoarded = savedFishData.isHoarded;
+        container.isDonated = savedCreatureData.isDonated;
+        container.isHoarded = savedCreatureData.isHoarded;
       }
       return container;
     });
 
-    this.setState({ fishies: newFishies, isLoading: false });
+    this.setState({ creatures: newCreatures, isLoading: false });
   }
 
   render() {
-    const { isLoading, fishies } = this.state;
+    const { type } = this.props;
+    const { isLoading, creatures } = this.state;
     if (isLoading) {
       return <LinearProgress variant="query" />;
     }
 
-    const FishList = fishies.map((fish) =>
-      <Grid item xs key={fish.index}>
-        <Fish {...fish} toggleAccumulation={this.toggleAccumulation} />
+    const CreatureList = creatures.map((creature) =>
+      <Grid item xs key={creature.index}>
+        <Creature {...creature} type={type} toggleAccumulation={this.toggleAccumulation} />
       </Grid>
     );
 
     return (
       <div style={{flexGrow: 1}}>
         <Grid container spacing={3}>
-          {FishList}
+          {CreatureList}
         </Grid>
       </div>
     );
   }
 }
 
-export default Fishies;
+export default Creatures;
