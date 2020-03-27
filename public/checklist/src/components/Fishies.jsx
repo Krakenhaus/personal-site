@@ -20,8 +20,20 @@ class Fishies extends Component {
 
   async componentDidMount() {
     const response = await fetch('/fish');
-    const fishies = await response.json();
-    console.log(fishies);
+    let fishies = await response.json();
+    fishies = fishies.sort((a, b) => {
+      // Use toUpperCase() to ignore character casing
+      const fishA = a.name.toUpperCase();
+      const fishB = b.name.toUpperCase();
+
+      let comparison = 0;
+      if (fishA > fishB) {
+        comparison = 1;
+      } else if (fishA < fishB) {
+        comparison = -1;
+      }
+      return comparison;
+    });
     this.setState({ fishies });
     this.mergeSavedData();
   }

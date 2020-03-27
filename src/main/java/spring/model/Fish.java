@@ -6,6 +6,7 @@ public class Fish {
     private String index;
     private String name;
     private List<Integer> northernMonths;
+    private String time;
 
     public String getIndex() {
         return index;
@@ -29,5 +30,15 @@ public class Fish {
 
     public void setNorthernMonths(List<Integer> northernMonths) {
         this.northernMonths = northernMonths;
+    }
+
+    public String getTime()
+    {
+        return time;
+    }
+
+    public void setTime(String time)
+    {
+        this.time = time;
     }
 }
