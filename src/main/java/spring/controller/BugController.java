@@ -9,7 +9,7 @@ import spring.service.BugService;
 import java.util.List;
 
 @RestController
-public class BugController {
+public class BugController extends ApiController {
 
     @Autowired
     private BugService bugService;

@@ -1,7 +1,20 @@
+export function getAvatarProps(name, type, seen) {
+  const image = seen ? `../images/${type}/${name.toLowerCase().replace(/\s/g, '')}.png` : null;
+  const info = props[name.toLowerCase()] || props.default;
+  const color = seen ? info.color : props.default.color;
+  const height = seen ? info.height : props.default.height;
+  const width = seen ? info.width : props.default.width;
+  return { image, color, height, width };
+}
+
 const sizes = {
   100: {
     width: '100%',
     height: '100%',
+  },
+  115: {
+    width: '115%',
+    height: '115%',
   },
   125: {
     width: '125%',
@@ -15,9 +28,9 @@ const sizes = {
     width: '200%',
     height: '200%',
   },
-}
+};
 
-export default {
+const props = {
   anchovy: {
     color: '#a8ebff',
     ...sizes[100],
@@ -112,11 +125,11 @@ export default {
   },
   dorado: {
     color: '#faff50',
-    ...sizes[125],
+    ...sizes[115],
   },
   'football fish': {
     color: '#623994',
-    ...sizes[125],
+    ...sizes[100],
   },
   'freshwater goby': {
     color: '#b7af5d',
@@ -136,35 +149,35 @@ export default {
   },
   'giant trevally': {
     color: '#a8d1d1',
-    ...sizes[125],
+    ...sizes[115],
   },
   'golden trout': {
     color: '#c9672f',
-    ...sizes[125],
+    ...sizes[100],
   },
   goldfish: {
     color: '#c1241c',
-    ...sizes[125],
+    ...sizes[150],
   },
   'great white shark': {
     color: '#38618a',
-    ...sizes[125],
+    ...sizes[115],
   },
   guppy: {
     color: '#7c275a',
-    ...sizes[125],
+    ...sizes[150],
   },
   'hammerhead shark': {
     color: '#aa7036',
-    ...sizes[125],
+    ...sizes[115],
   },
   'horse mackerel': {
     color: '#ffff02',
-    ...sizes[125],
+    ...sizes[150],
   },
   killifish: {
     color: '#c0d8c0',
-    ...sizes[125],
+    ...sizes[150],
   },
   'king salmon': {
     color: '#c9e2ea',
@@ -180,7 +193,7 @@ export default {
   },
   'mahi-mahi': {
     color: '#4ad699',
-    ...sizes[125],
+    ...sizes[100],
   },
   'mitten crab': {
     color: '#cbaa79',
@@ -196,11 +209,11 @@ export default {
   },
   'neon tetra': {
     color: '#f64c4c',
-    ...sizes[125],
+    ...sizes[150],
   },
   'nibble fish': {
     color: '#e7dfa5',
-    ...sizes[125],
+    ...sizes[150],
   },
   oarfish: {
     color: '#d7efef',
@@ -228,7 +241,7 @@ export default {
   },
   piranha: {
     color: '#ccdd33',
-    ...sizes[125],
+    ...sizes[150],
   },
   'pond smelt': {
     color: '#cec65a',
@@ -236,15 +249,15 @@ export default {
   },
   'pop-eyed goldfish': {
     color: '#949472',
-    ...sizes[125],
+    ...sizes[150],
   },
   rainbowfish: {
     color: '#e3e3b5',
-    ...sizes[125],
+    ...sizes[100],
   },
   'ranchu goldfish': {
     color: '#dfb576',
-    ...sizes[125],
+    ...sizes[100],
   },
   ray: {
     color: '#f5d318',
@@ -276,15 +289,15 @@ export default {
   },
   'sea butterfly': {
     color: '#ffe52a',
-    ...sizes[125],
+    ...sizes[150],
   },
   'sea horse': {
     color: '#e7746b',
-    ...sizes[125],
+    ...sizes[150],
   },
   'snapping turtle': {
     color: '#c19c66',
-    ...sizes[125],
+    ...sizes[100],
   },
   'soft-shelled turtle': {
     color: '#e9e983',
@@ -300,15 +313,15 @@ export default {
   },
   sturgeon: {
     color: '#c9bcb5',
-    ...sizes[125],
+    ...sizes[100],
   },
   suckerfish: {
     color: '#c2bfc4',
-    ...sizes[125],
+    ...sizes[100],
   },
   surgeonfish: {
     color: '#99ee99',
-    ...sizes[125],
+    ...sizes[150],
   },
   sweetfish: {
     color: '#e6f709',
@@ -316,11 +329,11 @@ export default {
   },
   tadpole: {
     color: '#d8d8c7',
-    ...sizes[125],
+    ...sizes[150],
   },
   tilapia: {
     color: '#b584c2',
-    ...sizes[125],
+    ...sizes[100],
   },
   tuna: {
     color: '#cba900',
@@ -330,7 +343,7 @@ export default {
     color: '#cdbcab',
     ...sizes[125],
   },
-  'yellow fish': {
+  'yellow perch': {
     color: '#90e56e',
     ...sizes[125],
   },

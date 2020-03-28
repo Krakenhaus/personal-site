@@ -1,10 +1,10 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import AlarmOnIcon from '@material-ui/icons/AlarmOn';
 import {
   Grid,
   Paper,
 } from '@material-ui/core';
+import { getCurrentMonth } from '../utils/date';
 
 const useStyles = makeStyles({
   root: {
@@ -24,27 +24,25 @@ const useStyles = makeStyles({
 });
 
 export default function Calendar(props) {
-  const { activeMonths, currentMonth } = props;
+  const { activeMonths } = props;
   const classes = useStyles();
 
   return (
     <Grid container className={classes.root} spacing={0}>
-
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(value => {
-            const active = activeMonths.includes(value);
-            const current = value === currentMonth;
-            let classNames = classes.month;
-            classNames = active ? classes.month : `${classes.month} ${classes.inactive}`;
-            classNames = current ? `${classNames} ${classes.current}` : classNames;
-            return (
-              <Grid key={value} item>
-                <Paper className={classNames} square outlined>
-                  {value}
-                </Paper>
-              </Grid>
-            );
-          })}
-
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(value => {
+        const active = activeMonths.includes(value);
+        const current = value === getCurrentMonth();
+        let classNames = classes.month;
+        classNames = active ? classes.month : `${classes.month} ${classes.inactive}`;
+        classNames = current ? `${classNames} ${classes.current}` : classNames;
+        return (
+          <Grid key={value} item>
+            <Paper className={classNames} square>
+              {value}
+            </Paper>
+          </Grid>
+        );
+      })}
     </Grid>
   );
 }
