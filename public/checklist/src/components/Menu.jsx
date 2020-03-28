@@ -31,7 +31,7 @@ function Menu(props) {
     setState({ ...state, open });
   };
 
-  const list = () => (
+  const MenuList = (
     <div
       className={classes.list}
       role="presentation"
@@ -54,7 +54,7 @@ function Menu(props) {
   return (
     <>
       <Drawer anchor="left" open={state.open} onClose={toggleDrawer(false)}>
-        {list()}
+        {MenuList}
       </Drawer>
       <AppBar position="static">
         <Toolbar>

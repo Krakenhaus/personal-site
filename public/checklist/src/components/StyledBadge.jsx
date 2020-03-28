@@ -4,7 +4,6 @@ import {
 } from '@material-ui/core';
 
 export default withStyles(theme => {
-  console.log(theme)
   return ({
     badge: {
       backgroundColor: '#44b700',

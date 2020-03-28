@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AlarmOnIcon from '@material-ui/icons/AlarmOn';
 import CheckIcon from '@material-ui/icons/Check';
 import {
-  Avatar,
   Card,
   CardActions,
   CardContent,
@@ -14,9 +13,10 @@ import {
   FormGroup,
   Grid,
 } from '@material-ui/core';
-import avatarProps from '../utils/avatarProps'
-import StyledBadge from './StyledBadge';
+import { getSaveData, setSaveData } from '../utils/storage';
+import { isActive } from '../utils/date';
 import Calendar from './Calendar';
+import Avatar from './Avatar';
 
 const useStyles = makeStyles({
   root: {
@@ -26,71 +26,87 @@ const useStyles = makeStyles({
   title: {
     marginTop: 0,
   },
-  avatar: {
-    marginRight: 10,
-  },
 });
+
+const defaultSaveData = {
+  isDonated: false,
+  isHoarded: false,
+}
 
 export default function Creature(props) {
 
   const classes = useStyles();
-  const { name, index, isDonated, isHoarded, northernMonths, time, toggleAccumulation, type } = props;
-  const today = new Date();
-  const currentMonth = today.getMonth() + 1;
-  const isActive = northernMonths.includes(currentMonth);
+  const {
+    name,
+    index,
+    activeMonths,
+    time,
+    type,
+  } = props;
+
+  const [state, setState] = useState({
+    ...defaultSaveData,
+    isLoading: true,
+  });
+  const { isDonated, isHoarded, isLoading } = state;
+
+  useEffect(() => {
+    const saveData = getSaveData({ type });
+    setState({ ...defaultSaveData, ...saveData[index], isLoading: false });
+  }, [index, type]);
+
+  const active = isActive(activeMonths);
   const complete = isDonated && isHoarded;
   const seen = isDonated || isHoarded;
 
-  const avatarImage = seen ? `../images/${type}/${name.toLowerCase().replace(/\s/g, '')}.png` : null;
-  const avatarInfo = avatarProps[name.toLowerCase()] || avatarProps.default;
-  const avatarColor = seen ? avatarInfo.color : avatarProps.default.color;
-  const avatarHeight = seen ? avatarInfo.height : avatarProps.default.height;
-  const avatarWidth = seen ? avatarInfo.width : avatarProps.default.width;
-  const avatar = isActive ? (
-      <StyledBadge
-        overlap="circle"
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        variant="dot"
-        className={classes.avatar}
-      >
-        <Avatar style={{'background-color': `${avatarColor}`}} imgProps={{style: {'width':`${avatarWidth}`,'height':`${avatarHeight}`}}} alt={name} src={avatarImage} />
-      </StyledBadge>
-    ): <Avatar style={{'background-color': `${avatarColor}`}} imgProps={{style: {'width':`${avatarWidth}`,'height':`${avatarHeight}`}}} className={classes.avatar} alt={name} src={avatarImage} />;
+  const toggleAccumulation = (e) => {
+    const prop = e.target.name;
+    const saveData = getSaveData({ type });
+    if (saveData[index]) {
+      saveData[index][prop] = !saveData[index][prop];
+    } else {
+      saveData[index] = {}
+      saveData[index][prop] = true;
+    }
+    setSaveData({ type }, saveData);
+    setState({...defaultSaveData, ...saveData[index], isLoading: false});
+  }
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <>
       <Card className={classes.root}>
         <CardContent>
           <div style={{display: 'flex'}}>
-            {avatar}
+            <Avatar active={active} name={name} seen={seen} type={type} />
             <h3 className={classes.title}>{name}</h3>
-            <div style={{'margin-left': 'auto'}}>
-            {isActive && <Chip color="secondary" icon={<AlarmOnIcon />} label={"Active!"}/>}
+            <div style={{'marginLeft': 'auto'}}>
+            {active && <Chip color="secondary" icon={<AlarmOnIcon />} label={"Active!"}/>}
             </div>
           </div>
           <Divider variant="inset"  />
-          <Grid container cellHeight={160} cols={2} spacing={2} justify="center" style={{'margin-top': '10px'}}>
-            <Grid item justify="center">
+          <Grid container cols={2} spacing={2} justify="center" style={{'marginTop': '10px'}}>
+            <Grid item container justify="center">
               <span>{time}</span>
             </Grid>
-            <Grid item justify="center">
-              <Calendar currentMonth={currentMonth} activeMonths={northernMonths} />
+            <Grid item container justify="center">
+              <Calendar activeMonths={activeMonths} />
             </Grid>
           </Grid>
 
         </CardContent>
-        <CardActions style={{'background-color': '#f0f0f0'}}>
+        <CardActions style={{'backgroundColor': '#f0f0f0'}}>
           <FormGroup row>
             <FormControlLabel
               control={<Checkbox
                 data-id={index}
                 checked={isDonated}
                 color="primary"
-                onChange={(e) => toggleAccumulation(e, 'isDonated')}
-                name="Donated"
+                onChange={toggleAccumulation}
+                name="isDonated"
               />}
               label="Donated"
             />
@@ -99,13 +115,13 @@ export default function Creature(props) {
                 data-id={index}
                 checked={isHoarded}
                 color="primary"
-                onChange={(e) => toggleAccumulation(e, 'isHoarded')}
-                name="Hoarded"
+                onChange={toggleAccumulation}
+                name="isHoarded"
               />}
               label="Hoarded"
             />
           </FormGroup>
-          {complete && <CheckIcon style={{'margin-left': 'auto'}} fontSize="large"/>}
+          {complete && <CheckIcon style={{'marginLeft': 'auto'}} fontSize="large"/>}
         </CardActions>
       </Card>
     </>

@@ -9,7 +9,7 @@ import spring.service.FishService;
 import java.util.List;
 
 @RestController
-public class FishController {
+public class FishController extends ApiController {
 
     @Autowired
     private FishService fishService;
