@@ -102,20 +102,52 @@ export default {
     color: '#8f8f6d',
     ...sizes[125],
   },
-  char: {
-    color: '#b7ae96',
+  dab: {
+    color: '#634208',
     ...sizes[125],
   },
-  char: {
-    color: '#b7ae96',
+  dace: {
+    color: '#f09b35',
     ...sizes[125],
   },
-  char: {
-    color: '#b7ae96',
+  dorado: {
+    color: '#faff50',
     ...sizes[125],
   },
-  char: {
-    color: '#b7ae96',
+  'football fish': {
+    color: '#623994',
+    ...sizes[125],
+  },
+  'freshwater goby': {
+    color: '#b7af5d',
+    ...sizes[125],
+  },
+  frog: {
+    color: '#9ac416',
+    ...sizes[125],
+  },
+  gar: {
+    color: '#e6cd83',
+    ...sizes[125],
+  },
+  'giant snakehead': {
+    color: '#6b6b39',
+    ...sizes[125],
+  },
+  'giant trevally': {
+    color: '#a8d1d1',
+    ...sizes[125],
+  },
+  'golden trout': {
+    color: '#c9672f',
+    ...sizes[125],
+  },
+  goldfish: {
+    color: '#c1241c',
+    ...sizes[125],
+  },
+  'great white shark': {
+    color: '#38618a',
     ...sizes[125],
   },
   default: {
