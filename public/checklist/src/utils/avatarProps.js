@@ -150,6 +150,194 @@ export default {
     color: '#38618a',
     ...sizes[125],
   },
+  guppy: {
+    color: '#7c275a',
+    ...sizes[125],
+  },
+  'hammerhead shark': {
+    color: '#aa7036',
+    ...sizes[125],
+  },
+  'horse mackerel': {
+    color: '#ffff02',
+    ...sizes[125],
+  },
+  killifish: {
+    color: '#c0d8c0',
+    ...sizes[125],
+  },
+  'king salmon': {
+    color: '#c9e2ea',
+    ...sizes[125],
+  },
+  koi: {
+    color: '#d75321',
+    ...sizes[125],
+  },
+  loach: {
+    color: '#d1c08d',
+    ...sizes[125],
+  },
+  'mahi-mahi': {
+    color: '#4ad699',
+    ...sizes[125],
+  },
+  'mitten crab': {
+    color: '#cbaa79',
+    ...sizes[125],
+  },
+  'moray eel': {
+    color: '#e9bf02',
+    ...sizes[125],
+  },
+  napoleonfish: {
+    color: '#78ebf4',
+    ...sizes[125],
+  },
+  'neon tetra': {
+    color: '#f64c4c',
+    ...sizes[125],
+  },
+  'nibble fish': {
+    color: '#e7dfa5',
+    ...sizes[125],
+  },
+  oarfish: {
+    color: '#d7efef',
+    ...sizes[125],
+  },
+  'ocean sunfish': {
+    color: '#a5e9e9',
+    ...sizes[125],
+  },
+  'olive flounder': {
+    color: '#c68421',
+    ...sizes[125],
+  },
+  'pale chub': {
+    color: '#90e5ff',
+    ...sizes[125],
+  },
+  'puffer fish': {
+    color: '#c4cce5',
+    ...sizes[125],
+  },
+  pike: {
+    color: '#c4d5a2',
+    ...sizes[125],
+  },
+  piranha: {
+    color: '#ccdd33',
+    ...sizes[125],
+  },
+  'pond smelt': {
+    color: '#cec65a',
+    ...sizes[125],
+  },
+  'pop-eyed goldfish': {
+    color: '#949472',
+    ...sizes[125],
+  },
+  rainbowfish: {
+    color: '#e3e3b5',
+    ...sizes[125],
+  },
+  'ranchu goldfish': {
+    color: '#dfb576',
+    ...sizes[125],
+  },
+  ray: {
+    color: '#f5d318',
+    ...sizes[125],
+  },
+  'red snapper': {
+    color: '#f8be9d',
+    ...sizes[125],
+  },
+  'ribbon eel': {
+    color: '#e5e5c3',
+    ...sizes[125],
+  },
+  'saddled bichir': {
+    color: '#d5b391',
+    ...sizes[125],
+  },
+  salmon: {
+    color: '#d15e66',
+    ...sizes[125],
+  },
+  'saw shark': {
+    color: '#deab9a',
+    ...sizes[125],
+  },
+  'sea bass': {
+    color: '#b2d46e',
+    ...sizes[125],
+  },
+  'sea butterfly': {
+    color: '#ffe52a',
+    ...sizes[125],
+  },
+  'sea horse': {
+    color: '#e7746b',
+    ...sizes[125],
+  },
+  'snapping turtle': {
+    color: '#c19c66',
+    ...sizes[125],
+  },
+  'soft-shelled turtle': {
+    color: '#e9e983',
+    ...sizes[125],
+  },
+  squid: {
+    color: '#d3ba88',
+    ...sizes[125],
+  },
+  stringfish: {
+    color: '#d8d8b6',
+    ...sizes[125],
+  },
+  sturgeon: {
+    color: '#c9bcb5',
+    ...sizes[125],
+  },
+  suckerfish: {
+    color: '#c2bfc4',
+    ...sizes[125],
+  },
+  surgeonfish: {
+    color: '#99ee99',
+    ...sizes[125],
+  },
+  sweetfish: {
+    color: '#e6f709',
+    ...sizes[125],
+  },
+  tadpole: {
+    color: '#d8d8c7',
+    ...sizes[125],
+  },
+  tilapia: {
+    color: '#b584c2',
+    ...sizes[125],
+  },
+  tuna: {
+    color: '#cba900',
+    ...sizes[125],
+  },
+  'whale shark': {
+    color: '#cdbcab',
+    ...sizes[125],
+  },
+  'yellow fish': {
+    color: '#90e56e',
+    ...sizes[125],
+  },
+  'zebra turkeyfish': {
+    color: '#dd9966',
+    ...sizes[125],
+  },
   default: {
     color: '#bdbdbd',
     ...sizes[100],
