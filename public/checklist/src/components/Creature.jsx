@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AlarmOnIcon from '@material-ui/icons/AlarmOn';
 import CheckIcon from '@material-ui/icons/Check';
+import MoneyIcon from '@material-ui/icons/MonetizationOnTwoTone';
+import RoomIcon from '@material-ui/icons/RoomTwoTone';
+import SizeIcon from '@material-ui/icons/HeightTwoTone';
 import {
   Card,
   CardActions,
@@ -22,10 +25,23 @@ const useStyles = makeStyles({
   root: {
     width: 350,
     padding: 0,
+    overflow: 'visible',
   },
   title: {
     marginTop: 0,
   },
+  incomplete: {
+    backgroundColor: '#f0f0f0',
+    transition: 'background-color .2s ease',
+  },
+  complete: {
+    backgroundColor: '#d8f2a0',
+    transition: 'background-color .5s ease',
+  },
+  partial: {
+    backgroundColor: '#f7f1df',
+    transition: 'background-color .5s ease',
+  }
 });
 
 const defaultSaveData = {
@@ -33,17 +49,24 @@ const defaultSaveData = {
   isHoarded: false,
 }
 
+const formatPrice = (num) => {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
 export default function Creature(props) {
 
   const classes = useStyles();
   const {
-    name,
-    index,
     activeMonths,
+    index,
+    location,
+    name,
+    price,
+    size,
     time,
     type,
   } = props;
-
+  const priceString = formatPrice(price);
   const [state, setState] = useState({
     ...defaultSaveData,
     isLoading: true,
@@ -84,10 +107,16 @@ export default function Creature(props) {
             <Avatar active={active} name={name} seen={seen} type={type} />
             <h3 className={classes.title}>{name}</h3>
             <div style={{'marginLeft': 'auto'}}>
-            {active && <Chip color="secondary" icon={<AlarmOnIcon />} label={"Active!"}/>}
+              {active && <Chip color="secondary" icon={<AlarmOnIcon />} label={"Active!"}/>}
             </div>
           </div>
-          <Divider variant="inset"  />
+          <Divider variant="inset" />
+          <div style={{display: 'flex', justifyContent: 'flex-end', padding:5, marginTop: 5}}>
+            <Chip style={{marginLeft: 5}} icon={<MoneyIcon />} label={priceString}/>
+            <Chip style={{marginLeft: 5}} icon={<RoomIcon />} label={location}/>
+            {size && <Chip style={{marginLeft: 5}} icon={<SizeIcon />} label={size}/>}
+          </div>
+
           <Grid container cols={2} spacing={2} justify="center" style={{'marginTop': '10px'}}>
             <Grid item container justify="center">
               <span>{time}</span>
@@ -98,7 +127,7 @@ export default function Creature(props) {
           </Grid>
 
         </CardContent>
-        <CardActions style={{'backgroundColor': '#f0f0f0'}}>
+        <CardActions className={complete ? classes.complete : (seen ? classes.partial : classes.incomplete)}>
           <FormGroup row>
             <FormControlLabel
               control={<Checkbox

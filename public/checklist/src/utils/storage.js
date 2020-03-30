@@ -1,4 +1,5 @@
 const creatureKey = type => `greg-acnh-${type}`;
+export const sortKey = 'greg-acnh-sort';
 
 const getKeyString = (key) => {
   return key.key ? key.key : creatureKey(key.type);
@@ -22,3 +23,21 @@ export function setSaveData(key, data) {
     localStorage.setItem(storageKey,  JSON.stringify(data));
   }
 };
+
+export function mergeSavedCreatureData(creatures, type) {
+  const savedData = getSaveData({ type });
+  creatures.forEach((creature, i) => {
+    const savedInfo = savedData[creature.index];
+    if (savedInfo) {
+      creature.isDonated = !!(savedInfo.isDonated);
+      creature.isHoarded = !!(savedInfo.isHoarded);
+    } else {
+      creature.isDonated = false;
+      creature.isHoarded = false;
+    }
+
+  });
+
+  console.log(creatures);
+  return creatures;
+}

@@ -1,57 +1,89 @@
 import React, { useEffect, useState } from 'react';
 import {
+  CircularProgress,
   Grid,
-  LinearProgress,
 } from '@material-ui/core';
+import { sortCreatures } from '../utils/sort';
+import { searchCreatures } from '../utils/search';
+import { filterCreatures } from '../utils/filter';
 import Creature from './Creature';
+import { FixedSizeList } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 export default function Creatures(props) {
 
-  const { type } = props;
-  const [state, setState] = useState({
-    creatures: [],
-    isLoading: true,
-  });
-  const { creatures, isLoading } = state;
+  const { type, search, sort, filters } = props;
+  const [creatures, setCreatures] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true)
+  }, [sort, search, filters]);
 
   useEffect(() => {
     async function fetchCreatures() {
       const response = await fetch(`/api/${type}`);
       let newCreatures = await response.json();
-      newCreatures = newCreatures.sort((a, b) => {
-        // Use toUpperCase() to ignore character casing
-        const creatureA = a.name.toUpperCase();
-        const creatureB = b.name.toUpperCase();
-
-        let comparison = 0;
-        if (creatureA > creatureB) {
-          comparison = 1;
-        } else if (creatureA < creatureB) {
-          comparison = -1;
-        }
-        return comparison;
-      });
-      setState({ creatures: newCreatures });
+      newCreatures = sortCreatures(newCreatures, sort);
+      newCreatures = searchCreatures(newCreatures, search);
+      newCreatures = filterCreatures(newCreatures, filters);
+      setCreatures(newCreatures);
+      setIsLoading(false)
     }
     fetchCreatures();
-  }, [type]);
+  }, [type, sort, search, filters]);
+
 
   if (isLoading) {
-    return <LinearProgress variant="query" />;
+    return <CircularProgress variant="query" style={{ margin: 100 }}/>;
   }
 
-  const monthRegion = 'northernMonths';
-  const CreatureList = creatures.map((creature) =>
-    <Grid item xs key={creature.index}>
-      <Creature {...creature} type={type} activeMonths={creature[monthRegion]} />
-    </Grid>
-  );
+  function CreatureList(props) {
+    const { data: { itemsPerRow, monthRegion }, index, style } = props;
+    const trueIndex = index * itemsPerRow;
+    const padding = index === 0 ? { marginTop: 40 } : {};
+    const rowData = creatures.slice(trueIndex, trueIndex + itemsPerRow).map((creature) =>
+      <Grid item key={creature.index} style={padding}>
+        <Creature {...creature} type={type} activeMonths={creature[monthRegion]} />
+      </Grid>
+    );
+
+    return (
+      <div style={style}>
+        <Grid container
+              direction="row"
+              justify="center"
+              alignItems="center"
+              spacing={10}
+        >
+          {rowData}
+        </Grid>
+      </div>
+    );
+  }
+
 
   return (
-    <div style={{flexGrow: 1}}>
-      <Grid container spacing={3}>
-        {CreatureList}
-      </Grid>
-    </div>
+    <AutoSizer>
+      {({ height, width }) => {
+        const itemWidth = 430;
+        let itemsPerRow = Math.floor(width / itemWidth) || 1;
+        itemsPerRow = itemsPerRow > 3 ? 3 : itemsPerRow;
+        const itemCount = Math.ceil(creatures.length / itemsPerRow);
+        const monthRegion = 'northernMonths';
+        return (
+          <FixedSizeList
+            itemData={{ itemsPerRow, monthRegion }}
+            height={height - 64}
+            width={width}
+            itemSize={350}
+            itemCount={itemCount}
+            style={{overflowX: 'hidden'}}
+          >
+            {CreatureList}
+          </FixedSizeList>
+        );
+      }}
+    </AutoSizer>
   );
 }
