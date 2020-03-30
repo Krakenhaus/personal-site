@@ -27,6 +27,7 @@ public class BugService implements CreatureService<Bug> {
             InputStream is = new ClassPathResource(bugCSV).getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
+            reader.readLine(); // Skip first line; it's the header
             String line;
             while ((line = reader.readLine()) != null)
             {

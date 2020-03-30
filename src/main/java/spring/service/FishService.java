@@ -27,6 +27,7 @@ public class FishService implements CreatureService<Fish> {
             InputStream is = new ClassPathResource(fishCSV).getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
+            reader.readLine(); // Skip first line; it's the header
             String line;
             while ((line = reader.readLine()) != null)
             {

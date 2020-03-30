@@ -17,13 +17,13 @@ index,name,location,size,value,time,northern,southern
 16,Freshwater Goby,River,Small,400,4 p.m. - 9 a.m.,All,All
 17,Loach,River,Small,400,All day,March-May,September-November
 18,Catfish,Pond,?,800,4 p.m. - 9 a.m.,May-October,November-April
-19,Giant Snakehead,Pond,X Large,?,9 a.m. - 4 p.m.,June-August, December-February
+19,Giant Snakehead,Pond,X Large,5500,9 a.m. - 4 p.m.,June-August, December-February
 20,Bluegill,River,Small,180,9 a.m. - 4 p.m.,All,All
 21,Yellow Perch,River,Medium,300,All day,October-March,April-September
 22,Black Bass,River,Large,400,All day,All,All
 23,Tilapia,River,?,800,All day,June-October,December-April
 24,Pike,River,X Large,1800,All day,September-December,March-June
-25,Pond Smelt,River,Small,?,All day,December-February,June-August
+25,Pond Smelt,River,Small,500,All day,December-February,June-August
 26,Sweetfish,River,Medium,900,All day,July-September,January-March
 27,Cherry Salmon,River,Medium,1000,All day,March-June|September-November,March-May|September-December
 28,Char,River/Pond,Medium,3800,4 p.m. - 9 a.m.,March-June|September-November,March-May|September-December
@@ -52,7 +52,7 @@ index,name,location,size,value,time,northern,southern
 51,Butterfly Fish,Sea,Small,1000,All day,April-September,October-March
 52,Napoleonfish,Sea,Largest,10000,4 a.m. - 9 p.m.,July-August,January-February
 53,Zebra Turkeyfish,Sea,Medium,500,All day,April-November,October-May
-54,Blowfish,Sea,Medium,?,6 p.m. - 4 a.m.,November-February,May-August
+54,Blowfish,Sea,Medium,5000,6 p.m. - 4 a.m.,November-February,May-August
 55,Puffer Fish,Sea,Medium,250,All day,July-September,January-March
 56,Anchovy,Sea,Small,200,4 a.m. - 9 p.m.,All,All
 57,Horse Mackerel,Sea,Small,150,All day,All,All
@@ -65,7 +65,7 @@ index,name,location,size,value,time,northern,southern
 64,Moray Eel,Sea,X Large,2000,All day,August-October,February-April
 65,Ribbon Eel,Sea,Narrow,600,All day,June-October,December-April
 66,Tuna,Pier,X Large,7000,All day,November-April,May-October
-67,Blue Marlin,Pier,X Large,10000,All day,July-September November-April,January-March|May-November
+67,Blue Marlin,Pier,X Large,10000,All day,July-September|November-April,January-March|May-November
 68,Giant Trevally,Pier,Large,4500,All day,May-October,November-April
 69,Mahi-mahi,Sea,Large,6000,All day,May-October,November-April
 70,Ocean Sunfish,Sea,Largest (Fin),4000,4 a.m. - 9 p.m.,July-September, January-March
