@@ -31,13 +31,13 @@ export function mergeSavedCreatureData(creatures, type) {
     if (savedInfo) {
       creature.isDonated = !!(savedInfo.isDonated);
       creature.isHoarded = !!(savedInfo.isHoarded);
+      creature.isFigurine = !!(savedInfo.isFigurine);
     } else {
       creature.isDonated = false;
       creature.isHoarded = false;
+      creature.isFigurine = false;
     }
-
   });
 
-  console.log(creatures);
   return creatures;
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   AppBar,
+  Button,
   Divider,
   Drawer,
   List,
@@ -11,6 +12,7 @@ import {
   Toolbar,
   Typography,
 } from '@material-ui/core';
+import GitHubIcon from '@material-ui/icons/GitHub';
 import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
 import Sort from './Sort';
@@ -21,6 +23,12 @@ const useStyles = makeStyles((theme) => ({
   appBar: {
     background: 'repeating-linear-gradient(45deg, #333333 0, #333333 5%, #4f4f4f 0, #4f4f4f 50%) 0 / 10px 10px',
     flexGrow: 1,
+  },
+  button: {
+    display: 'none',
+    [theme.breakpoints.up('sm')]: {
+      display: 'inherit',
+    },
   },
   list: {
     width: 250,
@@ -108,10 +116,17 @@ function Menu(props) {
           <Typography variant="h6" className={classes.title}>
             {pageName}
           </Typography>
-
+          <Button
+            href="https://github.com/Krakenhaus/animalcrossing/issues"
+            target="_blank"
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            startIcon={<GitHubIcon />}
+          >
+            Report issues on GitHub
+          </Button>
           <Search onChangeSearch={onChangeSearch} />
-
-
         </Toolbar>
       </AppBar>
     </>
