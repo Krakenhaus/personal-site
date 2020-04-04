@@ -35,7 +35,7 @@ export default function Creatures(props) {
 
 
   if (isLoading) {
-    return <CircularProgress variant="query" style={{ margin: 100 }}/>;
+    return <CircularProgress style={{ margin: 100 }}/>;
   }
 
   function CreatureList(props) {
@@ -66,7 +66,7 @@ export default function Creatures(props) {
   return (
     <AutoSizer>
       {({ height, width }) => {
-        const itemWidth = 430;
+        const itemWidth = 455;
         let itemsPerRow = Math.floor(width / itemWidth) || 1;
         itemsPerRow = itemsPerRow > 3 ? 3 : itemsPerRow;
         const itemCount = Math.ceil(creatures.length / itemsPerRow);

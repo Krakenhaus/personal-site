@@ -23,12 +23,17 @@ import Avatar from './Avatar';
 
 const useStyles = makeStyles({
   root: {
-    width: 350,
+    width: 375,
     padding: 0,
     overflow: 'visible',
   },
   title: {
     marginTop: 0,
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    paddingRight: 10,
+    paddingTop: 10,
   },
   incomplete: {
     backgroundColor: '#f0f0f0',
@@ -47,6 +52,7 @@ const useStyles = makeStyles({
 const defaultSaveData = {
   isDonated: false,
   isHoarded: false,
+  isFigurine: false,
 }
 
 const formatPrice = (num) => {
@@ -71,7 +77,7 @@ export default function Creature(props) {
     ...defaultSaveData,
     isLoading: true,
   });
-  const { isDonated, isHoarded, isLoading } = state;
+  const { isDonated, isHoarded, isFigurine, isLoading } = state;
 
   useEffect(() => {
     const saveData = getSaveData({ type });
@@ -79,8 +85,8 @@ export default function Creature(props) {
   }, [index, type]);
 
   const active = isActive(activeMonths);
-  const complete = isDonated && isHoarded;
-  const seen = isDonated || isHoarded;
+  const complete = isDonated && isHoarded && isFigurine;
+  const seen = isDonated || isHoarded || isFigurine;
 
   const toggleAccumulation = (e) => {
     const prop = e.target.name;
@@ -106,7 +112,7 @@ export default function Creature(props) {
           <div style={{display: 'flex'}}>
             <Avatar active={active} name={name} seen={seen} type={type} />
             <h3 className={classes.title}>{name}</h3>
-            <div style={{'marginLeft': 'auto'}}>
+            <div style={{'marginLeft': 'auto', 'paddingTop': 5}}>
               {active && <Chip color="secondary" icon={<AlarmOnIcon />} label={"Active!"}/>}
             </div>
           </div>
@@ -148,6 +154,16 @@ export default function Creature(props) {
                 name="isHoarded"
               />}
               label="Hoarded"
+            />
+            <FormControlLabel
+              control={<Checkbox
+                data-id={index}
+                checked={isFigurine}
+                color="primary"
+                onChange={toggleAccumulation}
+                name="isFigurine"
+              />}
+              label="Figurine"
             />
           </FormGroup>
           {complete && <CheckIcon style={{'marginLeft': 'auto'}} fontSize="large"/>}

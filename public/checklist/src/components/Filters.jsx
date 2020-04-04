@@ -28,7 +28,7 @@ export default function Filters(props) {
     switch (FILTERS[filter]) {
       case FILTERS.ACTIVE:
         return <Chip
-          color={selected ? 'primary' : 'default'}
+          color={selected ? 'secondary' : 'default'}
           icon={<AlarmOnIcon />}
           label="Active!"
           onClick={(e) => handleChange(FILTERS.ACTIVE)}

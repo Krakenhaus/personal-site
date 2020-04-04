@@ -6,10 +6,10 @@ index,name,location,value,time,northern,southern
 5,Common Bluebottle,Flying,300,4 a.m. - 7 p.m.,April-August,October-February
 6,Paper Kite Butterfly,Flying,1000,8 a.m. - 7 p.m.,All,All
 7,Great Purple Emperor,Flying,3000,4 a.m. - 7 p.m.,May-August,December-March
-8,Monach Butterfly,Flying,140,4 a.m. - 5 p.m.,September-November,March-May
+8,Monarch Butterfly,Flying,140,4 a.m. - 5 p.m.,September-November,March-May
 9,Emperor Butterfly,Flying,4000,5 p.m. - 8 a.m.,June-September|December-March,December-March|June-September
 10,Agrias Butterfly,Flying,3000,8 a.m. - 5 p.m.,April-September,November-March
-11,Raja Brooke's Birdwing,Flying,2500,8 a.m. - 5 p.m.,April-September|December-February,November-March|June-August
+11,Rajah Brooke's Birdwing,Flying,2500,8 a.m. - 5 p.m.,April-September|December-February,November-March|June-August
 12,Queen Alexandra's Birdwing,Flying,4000,8 a.m. - 4 p.m.,May-September,November-March
 13,Moth,Flying by light,130,7 p.m. - 4 a.m.,All,All
 14,Atlas Moth,On trees,3000,7 p.m. - 4 a.m.,April-September,October-March
@@ -43,7 +43,7 @@ index,name,location,value,time,northern,southern
 42,Man-faced Stink Bug,On flowers,1000,7 p.m. - 8 a.m.,March-November,September-May
 43,Ladybug,On flowers,200,8 a.m. - 5 p.m.,March-June|October,September-December|April
 44,Tiger Beetle,On ground,1500,All day,February-November,August-May
-45,Jewel Beetle,On trees,2400,All day,April-August,October-February
+45,Jewel Beetle,On tree stumps,2400,All day,April-August,October-February
 46,Violin Beetle,On tree stumps,450,All day,May-June|September-November,November-December|March-April
 47,Citrus Long-horned Beetle,On tree stumps,350,All day,All,All
 48,Rosalia Batesi Beetle,On tree stumps,3000,All day,May-September,November-March
@@ -63,7 +63,7 @@ index,name,location,value,time,northern,southern
 62,Horned Dynastid,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
 63,Horned Atlas,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
 64,Horned Elephant,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
-65,Horned Herucles,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
+65,Horned Hercules,On trees,?,5 p.m. - 8 a.m.,July-August,January-February
 66,Walking Stick,Falls from shaking trees,?,4 a.m. - 8 a.m. 5 p.m. - 7 p.m.,July-November,January-May
 67,Walking Leaf,Near trees disguised as furniture leaf,600,All day,July-August,January-March
 68,Bagworm,Falls from shaking trees,600,All day,All,All

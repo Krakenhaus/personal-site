@@ -11,7 +11,7 @@ index,name,location,size,value,time,northern,southern
 10,Killifish,Pond,Smallest,300,All day,April-August,October-February
 11,Crawfish,Pond,Medium,200,All day,April-September,October-March
 12,Soft-shelled Turtle,River,Large,3750,4 p.m. - 9 a.m.,August-September,February-March
-13,Snapping Turtle,River,X Large,5000,9 a.m. - 4 a.m.,April-October,October-April
+13,Snapping Turtle,River,X Large,5000,9 p.m. - 4 a.m.,April-October,October-April
 14,Tadpole,Pond,Smallest,100,All day,March-July,September-January
 15,Frog,Pond,Small,120,All day,May-August,November-Feburary
 16,Freshwater Goby,River,Small,400,4 p.m. - 9 a.m.,All,All
