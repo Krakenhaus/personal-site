@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   AppBar,
   Button,
@@ -11,53 +11,65 @@ import {
   IconButton,
   Toolbar,
   Typography,
-} from '@material-ui/core';
-import GitHubIcon from '@material-ui/icons/GitHub';
-import MenuIcon from '@material-ui/icons/Menu';
-import { makeStyles } from '@material-ui/core/styles';
-import Sort from './Sort';
-import Search from './Search';
-import Filters from './Filters';
+} from "@material-ui/core";
+import GitHubIcon from "@material-ui/icons/GitHub";
+import MenuIcon from "@material-ui/icons/Menu";
+import { makeStyles } from "@material-ui/core/styles";
+import Sort from "./Sort";
+import Search from "./Search";
+import Filters from "./Filters";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
-    background: 'repeating-linear-gradient(45deg, #333333 0, #333333 5%, #4f4f4f 0, #4f4f4f 50%) 0 / 10px 10px',
+    background:
+      "repeating-linear-gradient(45deg, #333333 0, #333333 5%, #4f4f4f 0, #4f4f4f 50%) 0 / 10px 10px",
     flexGrow: 1,
   },
   button: {
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      display: 'inherit',
+    display: "none",
+    [theme.breakpoints.up("sm")]: {
+      display: "inherit",
     },
   },
   list: {
     width: 250,
   },
   menuTitle: {
-    textAlign: 'center',
+    textAlign: "center",
   },
   title: {
     flexGrow: 1,
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      display: 'block',
+    display: "none",
+    [theme.breakpoints.up("sm")]: {
+      display: "block",
     },
-    textAlign: 'left',
+    textAlign: "left",
   },
   toolbar: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     // display: 'flex',
     // marginLeft: 'auto',
-    height: 50
+    height: 50,
   },
 }));
 
 function Menu(props) {
   const classes = useStyles();
   const [state, setState] = React.useState({ open: false });
-  const { onUpdatePage, onChangeFilters, onChangeSearch, onChangeSort, pageName, filters, sort } = props;
-  const toggleDrawer = (open) => event => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+  const {
+    onUpdatePage,
+    onChangeFilters,
+    onChangeSearch,
+    onChangeSort,
+    pageName,
+    filters,
+    sort,
+  } = props;
+  const toggleDrawer = (open) => (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
       return;
     }
 
@@ -67,23 +79,20 @@ function Menu(props) {
   const handleUpdatePage = (page) => {
     onUpdatePage(page);
     setState({ ...state, open: false });
-  }
+  };
 
   const MenuList = (
-    <div
-      className={classes.list}
-      role="presentation"
-    >
+    <div className={classes.list} role="presentation">
       <List>
         <Typography variant="h6" className={classes.menuTitle}>
           Page
         </Typography>
         <Divider />
-        <ListItem button key="Fish" onClick={() => handleUpdatePage('Fish')}>
+        <ListItem button key="Fish" onClick={() => handleUpdatePage("Fish")}>
           <ListItemIcon>{<MenuIcon />}</ListItemIcon>
           <ListItemText primary="Fish" />
         </ListItem>
-        <ListItem button key="Bugs" onClick={() => handleUpdatePage('Bugs')}>
+        <ListItem button key="Bugs" onClick={() => handleUpdatePage("Bugs")}>
           <ListItemIcon>{<MenuIcon />}</ListItemIcon>
           <ListItemText primary="Bugs" />
         </ListItem>
@@ -110,7 +119,12 @@ function Menu(props) {
       </Drawer>
       <AppBar className={classes.appBar} position="sticky">
         <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={toggleDrawer(true)}
+          >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
