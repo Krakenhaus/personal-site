@@ -1,10 +1,10 @@
-package spring.controller;
+package spring.animalcrossing.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import spring.model.Bug;
-import spring.service.BugService;
+import spring.animalcrossing.model.Bug;
+import spring.animalcrossing.service.BugService;
 
 import java.util.List;
 

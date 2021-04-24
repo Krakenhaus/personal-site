@@ -1,10 +1,10 @@
-package spring.service;
+package spring.animalcrossing.service;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import spring.model.Bug;
-import spring.util.DateUtil;
+import spring.animalcrossing.model.Bug;
+import spring.animalcrossing.util.DateUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;

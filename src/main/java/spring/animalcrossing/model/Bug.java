@@ -1,4 +1,4 @@
-package spring.model;
+package spring.animalcrossing.model;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package spring.util;
+package spring.animalcrossing.util;
 
 import java.time.Month;
 import java.util.ArrayList;

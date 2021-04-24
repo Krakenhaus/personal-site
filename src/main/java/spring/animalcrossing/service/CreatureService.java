@@ -1,4 +1,4 @@
-package spring.service;
+package spring.animalcrossing.service;
 
 import java.util.List;
 

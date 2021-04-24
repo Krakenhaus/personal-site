@@ -22,7 +22,7 @@ export default function Creatures(props) {
 
   useEffect(() => {
     async function fetchCreatures() {
-      const response = await fetch(`/api/${type}`);
+      const response = await fetch(`/animalcrossing/api/${type}`);
       let newCreatures = await response.json();
       newCreatures = sortCreatures(newCreatures, sort);
       newCreatures = searchCreatures(newCreatures, search);
