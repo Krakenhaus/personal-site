@@ -35,7 +35,7 @@ public class TCGPlayerClient {
                 URI.create("https://api.tcgplayer.com/catalog/products/" + productIds + "?getExtendedFields=false&includeSkus=" + includeSkus))
                 .header("User-Agent", "Greg's Personal Site Card Tracker")
                 .header("Accept", "application/json")
-                .header("Authorization", "Bearer dCeKUrjcTUdkJwj6W62dZE-0L--_cwXFZ-Itd0g30vVbCMztlKx_81WQBuXO3npSRr9lY18E0ezfkhucviYoj_MhvSEzOWSYpXx0kYisCPlNV_1RxcShVdLrrhsV6dxVh-AWT2AmkPqdwBOpzMWIgRaMeLkelbER09YReEoO9W3pQgNCKnWtqBs3voM4g84NTiu1ZIW37bbwRdjWdrBtyVGEogWkc2B_OsmxaV5CscELFFDi3hRxqRX9RIJH24PklQqH7DZhEJLJWiPN-gtHHgdZANmNgQpKoIqFvYvXFl46U8S97EeueVYz01le5hwW6TQlXQ")
+                .header("Authorization", "")
                 .build();
 
         try {
@@ -70,7 +70,7 @@ public class TCGPlayerClient {
                 .header("User-Agent", "Greg's Personal Site Card Tracker")
                 .header("Accept", "application/json")
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer dCeKUrjcTUdkJwj6W62dZE-0L--_cwXFZ-Itd0g30vVbCMztlKx_81WQBuXO3npSRr9lY18E0ezfkhucviYoj_MhvSEzOWSYpXx0kYisCPlNV_1RxcShVdLrrhsV6dxVh-AWT2AmkPqdwBOpzMWIgRaMeLkelbER09YReEoO9W3pQgNCKnWtqBs3voM4g84NTiu1ZIW37bbwRdjWdrBtyVGEogWkc2B_OsmxaV5CscELFFDi3hRxqRX9RIJH24PklQqH7DZhEJLJWiPN-gtHHgdZANmNgQpKoIqFvYvXFl46U8S97EeueVYz01le5hwW6TQlXQ")
+                .header("Authorization", "")
                 .POST(HttpRequest.BodyPublishers.ofString(requestData))
                 .build();
 
@@ -98,7 +98,7 @@ public class TCGPlayerClient {
             URI.create("https://api.tcgplayer.com/pricing/sku/" + commaSeparatedSkus))
                 .header("User-Agent", "Greg's Personal Site Card Tracker")
                 .header("Accept", "application/json")
-                .header("Authorization", "Bearer dCeKUrjcTUdkJwj6W62dZE-0L--_cwXFZ-Itd0g30vVbCMztlKx_81WQBuXO3npSRr9lY18E0ezfkhucviYoj_MhvSEzOWSYpXx0kYisCPlNV_1RxcShVdLrrhsV6dxVh-AWT2AmkPqdwBOpzMWIgRaMeLkelbER09YReEoO9W3pQgNCKnWtqBs3voM4g84NTiu1ZIW37bbwRdjWdrBtyVGEogWkc2B_OsmxaV5CscELFFDi3hRxqRX9RIJH24PklQqH7DZhEJLJWiPN-gtHHgdZANmNgQpKoIqFvYvXFl46U8S97EeueVYz01le5hwW6TQlXQ")
+                .header("Authorization", "")
                 .build();
 
         try {

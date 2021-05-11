@@ -16,6 +16,7 @@ import {
 import { Alert } from "@material-ui/lab";
 import {
   Delete as DeleteIcon,
+  DragIndicator as DragIndicatorIcon,
   LocalAtm as LocalAtmIcon,
 } from "@material-ui/icons";
 import DetailsDialog from "./Details";
@@ -31,6 +32,10 @@ const useStyles = makeStyles((theme) => ({
     borderTopRightRadius: 15,
     opacity: (props) => (props.isBusy ? 0.5 : 1),
     cursor: (props) => (props.isBusy ? "0.5" : 1),
+  },
+  alert: {
+    marginTop: 30,
+    marginBottom: 15,
   },
   media: {
     height: 0,
@@ -127,8 +132,11 @@ export default function ({
     color: getColorRepresentation(condition),
     backgroundColor: getColorRepresentation(condition),
   };
-  const { lowestListingPrice, marketPrice, skuId: currentSkuId } =
-    skuPrice || {};
+  const {
+    lowestListingPrice,
+    marketPrice,
+    skuId: currentSkuId,
+  } = skuPrice || {};
   const setName = groupIds[set] ? groupIds[set].name : set;
 
   const { conditionId, printingId } =
@@ -172,17 +180,17 @@ export default function ({
               {setName}
             </Typography>
           </Tooltip>
-          <Typography
-            variant="caption"
-            display="block"
-            gutterBottom
-            className={classes.subHeader}
-          >
-            {`${conditionName} ${printingName}`}
-          </Typography>
-
           {!skuPriceIsDefault ? (
             <>
+              <Typography
+                variant="caption"
+                display="block"
+                gutterBottom
+                className={classes.subHeader}
+              >
+                {`${conditionName} ${printingName}`}
+              </Typography>
+
               <div>
                 <span>Market: </span>
                 <Chip
@@ -212,10 +220,21 @@ export default function ({
               </div>
             </>
           ) : (
-            <Alert severity="info">Set details to view pricing</Alert>
+            <Alert severity="info" className={classes.alert}>
+              Set details to view pricing
+            </Alert>
           )}
         </CardContent>
         <CardActions disableSpacing className={classes.cardActions}>
+          <IconButton
+            disabled={isBusy}
+            aria-label="move"
+            size="small"
+            style={{ cursor: "move" }}
+          >
+            <DragIndicatorIcon />
+          </IconButton>
+
           <Button
             disabled={isBusy}
             size="small"
@@ -233,6 +252,7 @@ export default function ({
             disabled={isBusy}
             aria-label="delete"
             style={{ marginLeft: "auto" }}
+            size="small"
             onClick={() => {
               if (!isBusy) {
                 setIsBusy(true);

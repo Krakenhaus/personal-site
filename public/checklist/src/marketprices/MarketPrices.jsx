@@ -15,6 +15,12 @@ import {
 } from "@material-ui/icons";
 import { LocalStorageApi, TCGPlayerApi } from "./Api";
 import GitHubIcon from "@material-ui/icons/GitHub";
+import {
+  GridContextProvider,
+  GridDropZone,
+  GridItem,
+  swap,
+} from "react-grid-dnd";
 
 import "./marketprices.css";
 
@@ -86,6 +92,21 @@ function MarketPrices() {
       document.body.classList.remove("market-prices-body");
     };
   });
+
+  // target id will only be set if dragging from one dropzone to another.
+  const onChange = (sourceId, sourceIndex, targetIndex, targetId) => {
+    try {
+      const sourceProductId = cards[sourceIndex].productId;
+      const targetProductId = cards[targetIndex].productId;
+      LocalStorageApi.updateWatchedProductOrder(sourceProductId, targetIndex);
+      LocalStorageApi.updateWatchedProductOrder(targetProductId, sourceIndex);
+
+      const nextCards = swap(cards, sourceIndex, targetIndex);
+      setCards(nextCards);
+    } catch (error) {
+      // tried to drop outside of drop zone
+    }
+  };
 
   const getProductDetails = async (params) => {
     const watchedProducts = LocalStorageApi.getWatchedProducts();
@@ -182,20 +203,22 @@ function MarketPrices() {
     }
 
     return (
-      <ProductCard
-        key={productId}
-        productId={productId}
-        name={name}
-        imageUrl={imageUrl}
-        set={groupId}
-        url={url}
-        skuDetails={skuDetails}
-        skuPrice={skuPrice}
-        skuPriceIsDefault={skuPriceIsDefault}
-        condition="near_mint"
-        handleRemoveCard={handleRemoveCard}
-        handleSkuChange={handleSkuChange}
-      />
+      <GridItem key={productId}>
+        <ProductCard
+          // key={productId}
+          productId={productId}
+          name={name}
+          imageUrl={imageUrl}
+          set={groupId}
+          url={url}
+          skuDetails={skuDetails}
+          skuPrice={skuPrice}
+          skuPriceIsDefault={skuPriceIsDefault}
+          condition="near_mint"
+          handleRemoveCard={handleRemoveCard}
+          handleSkuChange={handleSkuChange}
+        />
+      </GridItem>
     );
   });
 
@@ -261,7 +284,18 @@ function MarketPrices() {
             }}
           />
         )}
-        <div className={classes.cardContainer}>{productDetailsArray}</div>
+        <div className={classes.cardContainer}>
+          <GridContextProvider onChange={onChange}>
+            <GridDropZone
+              id="cards"
+              boxesPerRow={5}
+              rowHeight={420}
+              style={{ height: Math.ceil(cards.length / 5) * 420 }}
+            >
+              {productDetailsArray}
+            </GridDropZone>
+          </GridContextProvider>
+        </div>
       </div>
     </>
   );
