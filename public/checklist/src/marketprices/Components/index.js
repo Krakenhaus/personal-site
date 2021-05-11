@@ -1,3 +1,5 @@
-import CardDetails from './CardDetails'
+import DetailsDialog from "./Details";
+import ProductCard from "./ProductCard";
+import SearchDialog from "./Search";
 
-export default CardDetails;
+export { DetailsDialog, ProductCard, SearchDialog };
