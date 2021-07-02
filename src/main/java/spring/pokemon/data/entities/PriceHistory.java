@@ -33,14 +33,6 @@ public class PriceHistory {
     private Integer month;
     private Integer year;
 
-//    @OneToOne
-//    @JoinColumn(name = "skuId", referencedColumnName = "skuId", insertable = false, updatable = false)
-//    CardCollection cardCollection;
-//
-//    @OneToOne
-//    @JoinColumn(name = "skuId", referencedColumnName = "skuId", insertable = false, updatable = false)
-//    CardCollection cardCollection;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
