@@ -7,11 +7,9 @@ import org.springframework.stereotype.Service;
 import spring.pokemon.client.TCGPlayerClient;
 import spring.pokemon.client.model.TCGProductDetail;
 import spring.pokemon.client.model.TCGSkuPrice;
-import spring.pokemon.client.model.TCGToken;
 import spring.pokemon.data.PriceHistoryRepository;
 import spring.pokemon.data.ProductDetailsRepository;
 import spring.pokemon.data.SkuPricesRepository;
-import spring.pokemon.data.TokenRepository;
 import spring.pokemon.data.entities.*;
 import spring.pokemon.errors.InternalException;
 import spring.pokemon.model.SearchRequest;
@@ -32,23 +30,9 @@ public class ProductService {
     PriceHistoryRepository priceHistoryRepository;
 
     @Autowired
-    TokenRepository tokenRepository;
-
-    @Autowired
     TCGPlayerClient tcgPlayerClient;
 
-    public final static long MILLIS_PER_WEEK = 4 * 7 * 24 * 60 * 60 * 1000L;
-
-    private Token generateNewToken() {
-        TCGToken tcgToken = tcgPlayerClient.generateNewToken();
-        Token token = Token.builder()
-                .accessToken(tcgToken.getAccessToken())
-                .issued(tcgToken.getIssued())
-                .expires(tcgToken.getExpires())
-                .build();
-        tokenRepository.save(token);
-        return token;
-    }
+    public final static long MILLIS_PER_MONTH = 4 * 7 * 24 * 60 * 60 * 1000L;
 
     public List<FolderPriceHistory> getFolderPriceHistory(UUID folderId) {
         try {
@@ -74,7 +58,7 @@ public class ProductService {
         // Get non-stale prices from h2 cache
         List<SkuPrice> cachedSkuPrices = skuPricesRepository.findAllById(skuIdsList);
         cachedSkuPrices = cachedSkuPrices.stream().filter(cachedSkuPrice -> {
-            boolean stale = Math.abs(new Date().getTime() - cachedSkuPrice.getLastUpdateTime().getTime()) > MILLIS_PER_WEEK;
+            boolean stale = Math.abs(new Date().getTime() - cachedSkuPrice.getLastUpdateTime().getTime()) > MILLIS_PER_MONTH;
             return !stale;
         }).collect(Collectors.toList());
 

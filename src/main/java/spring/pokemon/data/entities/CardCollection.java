@@ -67,8 +67,4 @@ public class CardCollection implements Serializable {
     @JsonIgnore
     private UserMetadata userMetadata;
 
-//    @OneToOne
-//    @JoinColumn(name = "skuId", referencedColumnName = "id")
-//    PriceHistory priceHistory;
-
 }
