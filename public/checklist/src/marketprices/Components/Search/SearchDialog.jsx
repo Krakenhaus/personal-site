@@ -7,10 +7,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  LinearProgress,
 } from "@material-ui/core";
 import SearchForm from "./SearchForm";
 import ProductMatch from "./ProductMatch";
-import { LocalStorageApi } from "../../Api";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -37,14 +37,18 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     paddingTop: 0,
   },
+  linearProgress: {
+    width: "100%",
+  },
   loading: {
     marginTop: 50,
   },
 }));
 
-export default function SearchDialog({ isOpen, handleClose }) {
+export default function SearchDialog({ isOpen, handleClose, handleAddCard }) {
   const [matches, setMatches] = useState([]);
   const [isBusy, setIsBusy] = useState(false);
+  const [isBusy2, setIsBusy2] = useState(false);
   const [firstOpen, setFirstOpen] = useState(true);
   const classes = useStyles({ shouldScroll: matches.length !== 0 });
 
@@ -52,22 +56,22 @@ export default function SearchDialog({ isOpen, handleClose }) {
     setMatches(matchesReceived || []);
   };
 
-  const handleAddCard = (productId) => {
-    LocalStorageApi.addWatchedProduct(productId);
-    handleClose(true);
-  };
-
   const matchesArray = matches.map((match) => {
     const { groupId, imageUrl, name, productId, url } = match;
     return (
       <ProductMatch
         key={productId}
-        handleAddCard={handleAddCard}
+        handleAddCard={async (productId) => {
+          setIsBusy2(true);
+          await handleAddCard(productId);
+          handleClose();
+        }}
         name={name}
         productId={productId}
         imageUrl={imageUrl}
         groupId={groupId}
         url={url}
+        isBusy={isBusy2}
       />
     );
   });
@@ -75,7 +79,7 @@ export default function SearchDialog({ isOpen, handleClose }) {
   return (
     <Dialog
       open={isOpen}
-      onClose={() => handleClose(false)}
+      onClose={handleClose}
       fullWidth={!firstOpen}
       maxWidth="xl"
     >
@@ -93,6 +97,7 @@ export default function SearchDialog({ isOpen, handleClose }) {
           />
         </div>
         <div className={classes.matchContainer}>
+          {isBusy2 && <LinearProgress className={classes.linearProgress} />}
           {isBusy ? (
             <CircularProgress className={classes.loading} />
           ) : (
@@ -102,7 +107,7 @@ export default function SearchDialog({ isOpen, handleClose }) {
         <br />
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleClose(false)} color="primary">
+        <Button onClick={handleClose} color="primary">
           Close
         </Button>
       </DialogActions>

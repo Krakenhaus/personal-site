@@ -3,3 +3,7 @@ target
 apache-maven-3.6.3
 node_modules
 *.iml
+tcg.properties
+h2.tar.gz
+h2
+public/checklist/build

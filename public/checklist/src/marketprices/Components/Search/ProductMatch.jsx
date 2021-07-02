@@ -65,6 +65,7 @@ export default function ProductMatch({
   url,
   groupId,
   handleAddCard,
+  isBusy,
 }) {
   const classes = useStyles();
   const setName = groupIds[groupId] ? groupIds[groupId].name : groupId;
@@ -91,6 +92,7 @@ export default function ProductMatch({
           variant="contained"
           color="primary"
           size="large"
+          disabled={isBusy}
           className={classes.button}
           startIcon={<PlaylistAddIcon />}
           onClick={() => handleAddCard(productId)}

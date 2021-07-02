@@ -21,7 +21,13 @@ import {
 } from "@material-ui/icons";
 import DetailsDialog from "./Details";
 import { getColorRepresentation } from "../utils/condition";
-import { conditionIds, groupIds, printingIds } from "../utils";
+import {
+  cardTypes,
+  conditionIds,
+  formatCurrency,
+  groupIds,
+  printingIds,
+} from "../utils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 30,
     marginBottom: 15,
   },
-  media: {
+  cardMedia: {
     height: 0,
     paddingTop: "56.25%", // 16:9
     backgroundPosition: "top",
@@ -103,6 +109,22 @@ const useStyles = makeStyles((theme) => ({
       opacity: 0,
     },
   },
+  cardContent: {
+    padding: 0,
+  },
+  cardContentInner: {
+    padding: 16,
+  },
+  typeBar: {
+    backgroundColor: (props) => {
+      try {
+        return cardTypes[props.cardType].color;
+      } catch (error) {
+        return "#FFFFFF";
+      }
+    },
+    height: 5,
+  },
   cardActions: {
     backgroundColor: "#efefef",
     borderTop: "1px solid #ddd",
@@ -110,9 +132,24 @@ const useStyles = makeStyles((theme) => ({
   linearProgress: {
     width: "100%",
   },
+  folderChip: {
+    marginLeft: 2,
+  },
+  folderChips: {
+    "&::-webkit-scrollbar": {
+      display: "none",
+    },
+    marginTop: 5,
+    display: "flex",
+    overflow: "scroll",
+    width: 200,
+  },
 }));
 
-export default function ({
+export default function ProductCard({
+  allFolders,
+  folderMembership,
+  cardType,
   productId,
   name,
   condition,
@@ -121,13 +158,16 @@ export default function ({
   set,
   skuDetails,
   handleRemoveCard,
+  selectedFolder,
   skuPrice,
-  handleSkuChange,
+  handleProductDetailsChange,
+  handleSelectFolder,
   skuPriceIsDefault,
+  isCondensed,
 }) {
   const [isBusy, setIsBusy] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
-  const classes = useStyles({ isBusy });
+  const classes = useStyles({ isBusy, cardType });
   const conditionStyles = {
     color: getColorRepresentation(condition),
     backgroundColor: getColorRepresentation(condition),
@@ -137,6 +177,7 @@ export default function ({
     marketPrice,
     skuId: currentSkuId,
   } = skuPrice || {};
+
   const setName = groupIds[set] ? groupIds[set].name : set;
 
   const { conditionId, printingId } =
@@ -148,12 +189,31 @@ export default function ({
   const printingName = printingIds[printingId]
     ? printingIds[printingId].name
     : "";
+
+  const folderMembershipJsx = folderMembership.map((folder) => {
+    const { folderId, folderName } = folder;
+    const isSelected = folderId === selectedFolder.folderId;
+    return (
+      <Chip
+        className={classes.folderChip}
+        key={folderId}
+        label={folderName}
+        onClick={() => {
+          handleSelectFolder(folder);
+        }}
+        component="a"
+        clickable
+        variant={isSelected ? "default" : "outlined"}
+      />
+    );
+  });
+
   return (
     <>
       <Card className={classes.root}>
         <CardActionArea>
           <CardMedia
-            className={classes.media}
+            className={classes.cardMedia}
             image={imageUrl}
             title={name}
             onClick={() => {
@@ -161,69 +221,99 @@ export default function ({
             }}
           />
         </CardActionArea>
-        <CardContent>
-          <Tooltip title={name} aria-label={name} placement="top">
-            <Typography variant="h5" component="h5" className={classes.header}>
-              {!skuPriceIsDefault && (
-                <span className={classes.notifyBadge} style={conditionStyles} />
-              )}
-              {name}
-            </Typography>
-          </Tooltip>
-          <Tooltip title={setName} aria-label={setName} placement="top">
-            <Typography
-              variant="caption"
-              display="block"
-              gutterBottom
-              className={classes.subHeader}
-            >
-              {setName}
-            </Typography>
-          </Tooltip>
-          {!skuPriceIsDefault ? (
-            <>
-              <Typography
-                variant="caption"
-                display="block"
-                gutterBottom
-                className={classes.subHeader}
-              >
-                {`${conditionName} ${printingName}`}
-              </Typography>
+        <CardContent className={classes.cardContent}>
+          <div className={classes.typeBar}></div>
+          <div className={classes.cardContentInner}>
+            {!isCondensed && (
+              <>
+                <Tooltip title={name} aria-label={name} placement="top">
+                  <Typography
+                    variant="h5"
+                    component="h5"
+                    className={classes.header}
+                  >
+                    {!skuPriceIsDefault && (
+                      <span
+                        className={classes.notifyBadge}
+                        style={conditionStyles}
+                      />
+                    )}
+                    {name}
+                  </Typography>
+                </Tooltip>
+                <Tooltip title={setName} aria-label={setName} placement="top">
+                  <Typography
+                    variant="caption"
+                    display="block"
+                    gutterBottom
+                    className={classes.subHeader}
+                  >
+                    {setName}
+                  </Typography>
+                </Tooltip>
+              </>
+            )}
+            {!skuPriceIsDefault ? (
+              <>
+                {!isCondensed && (
+                  <Typography
+                    variant="caption"
+                    display="block"
+                    gutterBottom
+                    className={classes.subHeader}
+                  >
+                    {`${conditionName} ${printingName}`}
+                  </Typography>
+                )}
 
-              <div>
-                <span>Market: </span>
-                <Chip
-                  variant="outlined"
-                  label={marketPrice ? `$${marketPrice}` : "N/A"}
-                  icon={<LocalAtmIcon />}
-                  style={
-                    marketPrice
-                      ? { fontWeight: 600, color: "#6d9e03", margin: "5px" }
-                      : { color: "#888", margin: "5px" }
-                  }
-                />
-              </div>
+                <div>
+                  <span>Market: </span>
+                  <Chip
+                    variant="outlined"
+                    label={formatCurrency(marketPrice)}
+                    icon={<LocalAtmIcon />}
+                    style={
+                      marketPrice
+                        ? { fontWeight: 600, color: "#6d9e03", margin: "5px" }
+                        : { color: "#888", margin: "5px" }
+                    }
+                  />
+                </div>
 
-              <div>
-                <span>Lowest: </span>
+                <div>
+                  <span>Lowest: </span>
+                  <Chip
+                    variant="outlined"
+                    label={formatCurrency(lowestListingPrice)}
+                    icon={<LocalAtmIcon />}
+                    style={
+                      lowestListingPrice
+                        ? { fontWeight: 600, color: "#6d9e03", margin: "5px" }
+                        : { color: "#888", margin: "5px" }
+                    }
+                  />
+                </div>
+              </>
+            ) : (
+              <Alert severity="info" className={classes.alert}>
+                Set details to view pricing
+              </Alert>
+            )}
+            {!isCondensed && (
+              <div className={classes.folderChips}>
                 <Chip
-                  variant="outlined"
-                  label={lowestListingPrice ? `$${lowestListingPrice}` : "N/A"}
-                  icon={<LocalAtmIcon />}
-                  style={
-                    lowestListingPrice
-                      ? { fontWeight: 600, color: "#6d9e03", margin: "5px" }
-                      : { color: "#888", margin: "5px" }
-                  }
+                  label="All"
+                  component="a"
+                  clickable
+                  onClick={() => {
+                    handleSelectFolder({ folderName: "All" });
+                  }}
+                  variant={selectedFolder.folderId ? "outlined" : "default"}
                 />
+                {folderMembershipJsx}
               </div>
-            </>
-          ) : (
-            <Alert severity="info" className={classes.alert}>
-              Set details to view pricing
-            </Alert>
-          )}
+            )}
+          </div>
         </CardContent>
         <CardActions disableSpacing className={classes.cardActions}>
           <IconButton
@@ -270,16 +360,23 @@ export default function ({
           isOpen={detailsDialogOpen}
           skuDetails={skuDetails}
           name={name}
+          imageUrl={imageUrl}
           productId={productId}
+          folderMembership={folderMembership}
           initialSkuId={currentSkuId}
-          handleClose={async (skuIdChanged) => {
-            setDetailsDialogOpen(false);
-            if (skuIdChanged) {
+          allFolders={allFolders}
+          cardType={cardType}
+          skuPriceIsDefault={skuPriceIsDefault}
+          initialSkuPrice={skuPrice}
+          handleSave={async (needsSave, newAttributes) => {
+            if (needsSave) {
               setIsBusy(true);
-              await handleSkuChange();
+              await handleProductDetailsChange(productId, newAttributes);
               setIsBusy(false);
             }
           }}
+          handleClose={() => setDetailsDialogOpen(false)}
+          url={url}
         />
       )}
     </>

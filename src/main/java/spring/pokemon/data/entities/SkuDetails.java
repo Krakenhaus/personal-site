@@ -2,9 +2,12 @@ package spring.pokemon.data.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 
@@ -13,17 +16,8 @@ import javax.persistence.*;
 @Builder
 @Entity(name = "SkuDetails")
 @Table(name = "sku_details")
+@AllArgsConstructor
 public class SkuDetails {
-    public SkuDetails(Integer skuId, Integer languageId, Integer printingId, Integer conditionId, Integer productId, ProductDetails productDetails, SkuPrice skuPrice) {
-        this.skuId = skuId;
-        this.languageId = languageId;
-        this.printingId = printingId;
-        this.conditionId = conditionId;
-        this.productId = productId;
-        this.productDetails = productDetails;
-        this.skuPrice = skuPrice;
-    }
-
     protected SkuDetails() {
     }
 
@@ -40,7 +34,19 @@ public class SkuDetails {
     @JsonBackReference()
     private ProductDetails productDetails;
 
-    @OneToOne(mappedBy="skuDetails")
-    @JsonIgnore
-    private SkuPrice skuPrice;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SkuDetails that = (SkuDetails) o;
+
+        return new EqualsBuilder().append(skuId, that.skuId).append(languageId, that.languageId).append(printingId, that.printingId).append(conditionId, that.conditionId).append(productId, that.productId).append(productDetails, that.productDetails).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(skuId).append(languageId).append(printingId).append(conditionId).append(productId).append(productDetails).toHashCode();
+    }
 }
