@@ -1,89 +1,115 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
+import * as Scroll from "react-scroll";
 import { makeStyles } from "@material-ui/core/styles";
-import { ProductCard, SearchDialog } from "./Components";
+import { CircularProgress, Typography } from "@material-ui/core";
+import Alert from "@material-ui/lab/Alert";
 import {
-  AppBar,
-  Button,
-  Drawer,
-  IconButton,
-  Toolbar,
-  Typography,
-} from "@material-ui/core";
-import {
-  Menu as MenuIcon,
-  PlaylistAdd as PlaylistAddIcon,
-} from "@material-ui/icons";
+  CollectionActions,
+  Pagination,
+  ProductCard,
+  Menu,
+  SearchDialog,
+  UserIdDialog,
+} from "./Components";
 import { LocalStorageApi, TCGPlayerApi } from "./Api";
-import GitHubIcon from "@material-ui/icons/GitHub";
 import {
   GridContextProvider,
   GridDropZone,
   GridItem,
   swap,
 } from "react-grid-dnd";
+import { cardTypes, formatCurrency } from "./utils";
 
 import "./marketprices.css";
+
+const scroller = Scroll.scroller;
 
 const useStyles = makeStyles((theme) => ({
   root: {
     textAlign: "center",
     overflowY: "scroll",
-    height: "calc(100% - 65px) !important",
-  },
-  cardRoot: {
-    marginTop: 50,
-    marginBottom: 30,
-    textAlign: "center",
-    overflowY: "scroll",
-    height: "calc(100% - 50px) !important",
+    height: "calc(100% - 115px) !important",
+    transition: "background-color 0.6s linear",
+    backgroundColor: (props) => {
+      try {
+        return cardTypes[props.typeFilter].color;
+      } catch (error) {
+        console.log("you forgot a type dingus");
+      }
+    },
   },
   cardContainer: {
-    paddingTop: 40,
+    paddingTop: 20,
     paddingBottom: 100,
     width: "90%",
     textAlign: "left",
     display: "inline-block",
   },
-  drawerContents: {
-    minWidth: 300,
-    padding: 20,
+  cardsLoading: {
+    backgroundColor: "rgba(0,0,0,.5)",
+    height: "100%",
+    width: "100%",
+    position: "absolute",
+    zIndex: 999,
+    paddingTop: 150,
+    color: "#fff",
   },
-  appBar: {
-    background:
-      "repeating-linear-gradient(45deg, #333333 0, #333333 5%, #4f4f4f 0, #4f4f4f 50%) 0 / 10px 10px",
-    flexGrow: 1,
-  },
-  button: {
-    display: "none",
-    [theme.breakpoints.up("sm")]: {
-      display: "inherit",
-    },
-    margin: theme.spacing(1),
-  },
-  title: {
-    display: "none",
-    [theme.breakpoints.up("sm")]: {
-      display: "block",
-    },
-    textAlign: "left",
-  },
-  subtitle2: {
-    color: "#ddd",
-    marginLeft: 25,
-    flexGrow: 1,
+  marketPriceLabel: { float: "left", paddingTop: 10, paddingLeft: 15 },
+  paginationBar: {
+    position: "absolute",
+    bottom: 0,
+    zIndex: 999,
+    backgroundColor: "#fff",
+    width: "100%",
+    borderTop: "2px solid #999",
+    boxShadow: "0px -1px 10px 4px rgba(0,0,0,0.21)",
   },
 }));
 
-function MarketPrices() {
-  const classes = useStyles();
-  const [cards, setCards] = useState([]);
-  const [prices, setPrices] = useState([]);
-  const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(false);
+function getWindowDimensions() {
+  const { innerWidth: width, innerHeight: height } = window;
+  return {
+    width,
+    height,
+  };
+}
 
-  const [initialCardLoad, setInitialCardLoad] = useState(true);
-  const [initialPriceLoad, setInitialPriceLoad] = useState(true);
-
+export default function MarketPrices() {
+  const [displayCards, setDisplayCards] = useState([]);
+  const [typeFilter, setTypeFilter] = useState("All");
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState({
+    folderName: "All",
+    displayOrder: 0,
+  });
+  const [totalMarketPrice, setTotalMarketPrice] = useState(0);
+  const [allFolders, setAllFolders] = useState([]);
+  const [isCondensed, setIsCondensed] = useState(false);
+  const [sort, setSort] = useState({
+    sortBy: "marketPrice",
+    order: "desc",
+  });
+  const [pageSize, setPageSize] = useState(25);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [isCardsLoading, setIsCardsLoading] = useState(true);
+  const [hasUserId, setHasUserId] = useState(!!LocalStorageApi.getUserId());
+  const [error, setError] = useState("");
+
+  const [windowDimensions, setWindowDimensions] = useState(
+    getWindowDimensions()
+  );
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const classes = useStyles({ typeFilter });
 
   useEffect(() => {
     document.body.classList.add("market-prices-body");
@@ -94,129 +120,180 @@ function MarketPrices() {
   });
 
   // target id will only be set if dragging from one dropzone to another.
-  const onChange = (sourceId, sourceIndex, targetIndex, targetId) => {
+  const onChange = async (sourceId, sourceIndex, targetIndex, targetId) => {
     try {
-      const sourceProductId = cards[sourceIndex].productId;
-      const targetProductId = cards[targetIndex].productId;
-      LocalStorageApi.updateWatchedProductOrder(sourceProductId, targetIndex);
-      LocalStorageApi.updateWatchedProductOrder(targetProductId, sourceIndex);
-
-      const nextCards = swap(cards, sourceIndex, targetIndex);
-      setCards(nextCards);
+      const nextCards = swap(displayCards, sourceIndex, targetIndex);
+      setDisplayCards(nextCards);
+      // TODO: save order of entire collection at this point - put in save button?
     } catch (error) {
       // tried to drop outside of drop zone
     }
   };
 
-  const getProductDetails = async (params) => {
-    const watchedProducts = LocalStorageApi.getWatchedProducts();
-    const watchedProductIds = Object.keys(watchedProducts);
-    if (watchedProductIds.length === 0) {
-      if (cards.length !== 0) {
-        setCards([]);
-      }
-      return;
-    }
-
+  const getProductDetails = async () => {
     try {
-      const response = await TCGPlayerApi.getProductDetails(watchedProductIds);
-      response.sort((product1, product2) => {
-        return (
-          watchedProducts[product1.productId].order -
-          watchedProducts[product2.productId].order
-        );
+      const response = await TCGPlayerApi.getCardCollection(
+        sort,
+        typeFilter,
+        selectedFolder,
+        pageSize,
+        pageIndex
+      );
+      const { content, totalElements = 0 } = response;
+      if (!content) {
+        throw new Error("Error calling API");
+      }
+
+      setTotalProducts(totalElements);
+      setDisplayCards(content);
+      getProductMarketPrice();
+
+      scroller.scrollTo("topScrollToElement", {
+        duration: 800,
+        delay: 100,
+        smooth: true,
+        containerId: "topScrollToElement",
+        offset: -50,
       });
-      setCards(response);
     } catch (error) {
+      setDisplayCards([]);
       console.log(error);
+    } finally {
+      setIsCardsLoading(false);
     }
   };
 
-  const getSkuPrices = async () => {
-    const watchedProducts = LocalStorageApi.getWatchedProducts();
-    const watchedSkuIds = Object.keys(watchedProducts).map(
-      (watchedProductId) => {
-        return watchedProducts[watchedProductId].skuId;
-      }
-    );
-    if (watchedSkuIds.length === 0) {
-      return;
-    }
-
+  const getProductMarketPrice = async () => {
     try {
-      const response = await TCGPlayerApi.getSkuPrices(watchedSkuIds);
-      setPrices(response);
+      const response = await TCGPlayerApi.getCardCollectionMarketPrice(
+        typeFilter,
+        selectedFolder
+      );
+
+      setTotalMarketPrice(response);
+    } catch (error) {
+      setTotalMarketPrice(0);
+      console.log(error);
+    }
+  };
+
+  const getAllFolders = async () => {
+    try {
+      const response = await TCGPlayerApi.getFolders();
+      setAllFolders(response);
     } catch (error) {
       console.log(error);
     }
   };
 
-  // Get the product details from h2/tcgplayer
   useEffect(() => {
-    if (initialCardLoad) {
-      setInitialCardLoad(false);
-      getProductDetails();
-    }
-  });
-
-  // Get the sku prices from h2/tcgplayer
-  useEffect(() => {
-    if (initialPriceLoad) {
-      setInitialPriceLoad(false);
-      getSkuPrices();
-    }
-  }, [cards]);
-
-  const handleRemoveCard = (productId) => {
-    LocalStorageApi.removeWatchedProduct(productId);
     getProductDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sort, typeFilter, selectedFolder, pageSize, pageIndex, hasUserId]);
+
+  useEffect(() => {
+    getAllFolders();
+  }, []);
+
+  const handleAddCard = async (productId) => {
+    setIsCardsLoading(true);
+    try {
+      await TCGPlayerApi.addCardToCollection(productId, selectedFolder);
+      await getProductDetails();
+    } catch (error) {
+      setError(error);
+    } finally {
+      setIsCardsLoading(false);
+    }
   };
 
-  const handleSkuChange = async () => {
-    await getSkuPrices();
+  const handleRemoveCard = async (productId) => {
+    setIsCardsLoading(true);
+    await TCGPlayerApi.removeCardFromCollection(productId);
+    await getProductDetails();
   };
 
-  const totalMarketPrice = prices.reduce(function (acc, price) {
-    if (price.marketPrice) {
-      acc = acc + price.marketPrice;
-    }
-    return acc;
-  }, 0);
+  const handleSelectFolder = (newFolder) => {
+    setIsCardsLoading(true);
+    setPageIndex(0);
+    setSelectedFolder(newFolder);
+  };
 
-  const productDetailsArray = cards.map((card) => {
-    const { productId, name, imageUrl, groupId, skuDetails, url } = card;
+  const handleAddFolder = async (folderName) => {
+    await TCGPlayerApi.addFolder(folderName);
+    await getAllFolders();
+  };
 
-    // Find the price
-    let skuPriceIsDefault = true;
-    let skuPrice = skuDetails[0];
-    if (prices.length > 0) {
-      const watchedPrice = prices.find((price) => {
-        if (price.skuDetails) {
-          return price.skuDetails.productId === productId;
-        }
-        return false;
-      });
-      if (watchedPrice) {
-        skuPrice = watchedPrice;
-        skuPriceIsDefault = false;
-      }
-    }
+  const handleDeleteFolder = async (folderId) => {
+    setIsCardsLoading(true);
+    await TCGPlayerApi.deleteFolder(folderId);
+    await getAllFolders();
+    await getProductDetails();
+  };
+
+  const handlePriceRefresh = async () => {
+    setIsCardsLoading(true);
+    const skuIdsToRefresh = displayCards
+      .filter((displayCard) => {
+        return !!displayCard.skuId;
+      })
+      .map((displayCard) => {
+        return displayCard.skuId;
+      })
+      .join(",");
+    await TCGPlayerApi.getSkuPrices(skuIdsToRefresh);
+    await getProductDetails();
+  };
+
+  const handleProductDetailsChange = async (productId, newAttributes) => {
+    await TCGPlayerApi.updateCardInCollection(productId, newAttributes);
+    await getProductDetails();
+  };
+
+  const handleTypeFilterChange = (newFilter) => {
+    setIsCardsLoading(true);
+    setPageIndex(0);
+    setTypeFilter(newFilter);
+  };
+
+  const productDetailsArray = displayCards.map((card) => {
+    const {
+      productDetails: {
+        skuDetails,
+        cardType,
+        productId,
+        name,
+        imageUrl,
+        groupId,
+        url,
+      },
+      skuPrice,
+      cardFolders: folderMembership = [],
+    } = card;
+
+    const skuPriceIsDefault = !skuPrice;
+    const defaultedSkuPrice = skuPrice || skuDetails[0];
 
     return (
       <GridItem key={productId}>
         <ProductCard
-          // key={productId}
+          allFolders={allFolders}
+          folderMembership={folderMembership}
+          cardType={cardType}
           productId={productId}
           name={name}
           imageUrl={imageUrl}
           set={groupId}
           url={url}
+          selectedFolder={selectedFolder}
           skuDetails={skuDetails}
-          skuPrice={skuPrice}
+          skuPrice={defaultedSkuPrice}
           skuPriceIsDefault={skuPriceIsDefault}
           condition="near_mint"
           handleRemoveCard={handleRemoveCard}
-          handleSkuChange={handleSkuChange}
+          handleProductDetailsChange={handleProductDetailsChange}
+          handleSelectFolder={handleSelectFolder}
+          isCondensed={isCondensed}
         />
       </GridItem>
     );
@@ -224,81 +301,101 @@ function MarketPrices() {
 
   return (
     <>
-      <Drawer
-        anchor="left"
-        open={isMenuDrawerOpen}
-        onClose={() => setIsMenuDrawerOpen(false)}
-      >
-        <div className={classes.drawerContents}>
-          {`Total Market Price: $${totalMarketPrice}`}
-        </div>
-      </Drawer>
-      <AppBar className={classes.appBar} position="sticky">
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={() => setIsMenuDrawerOpen(true)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            Current Market Prices
-          </Typography>
-          <Typography variant="subtitle2" className={classes.subtitle2}>
-            This product uses TCGplayer data but is not endorsed or certified by
-            TCGplayer.
-          </Typography>
-
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setSearchDialogOpen(true)}
-            className={classes.button}
-            startIcon={<PlaylistAddIcon />}
-          >
-            Add Card
-          </Button>
-          <Button
-            href="https://github.com/Krakenhaus/animalcrossing/issues"
-            target="_blank"
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            startIcon={<GitHubIcon />}
-          >
-            Report issues on GitHub
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <div className={classes.root}>
-        {searchDialogOpen && (
-          <SearchDialog
-            isOpen={searchDialogOpen}
-            handleClose={(cardAdded) => {
-              if (cardAdded) {
-                getProductDetails();
-              }
-              setSearchDialogOpen(false);
+      <Menu
+        allFolders={allFolders}
+        selectedFolder={selectedFolder}
+        handleAddFolder={handleAddFolder}
+        handleDeleteFolder={handleDeleteFolder}
+        handleOpenSearchDialog={() => setSearchDialogOpen(true)}
+        handleSelectFolder={handleSelectFolder}
+      />
+      <div id="topScrollToElement" className={classes.root}>
+        {isCardsLoading && (
+          <div className={classes.cardsLoading}>
+            <CircularProgress size={100} color="inherit" />
+          </div>
+        )}
+        {!hasUserId && (
+          <UserIdDialog
+            isOpen={!hasUserId}
+            handleClose={() => {
+              setIsCardsLoading(true);
+              setHasUserId(true);
             }}
           />
         )}
+        {searchDialogOpen && (
+          <SearchDialog
+            isOpen={searchDialogOpen}
+            handleClose={() => setSearchDialogOpen(false)}
+            handleAddCard={handleAddCard}
+          />
+        )}
+        <CollectionActions
+          isCondensed={isCondensed}
+          handleTypeFilterChange={handleTypeFilterChange}
+          handleCondenseView={(checked) => setIsCondensed(checked)}
+          typeFilter={typeFilter}
+          currentSort={sort}
+          handleSortChange={(newSort) => {
+            setIsCardsLoading(true);
+            setPageIndex(0);
+            setSort(newSort);
+          }}
+          handlePriceRefresh={handlePriceRefresh}
+        />
         <div className={classes.cardContainer}>
+          {error && <Alert severity="error">{error}</Alert>}
           <GridContextProvider onChange={onChange}>
             <GridDropZone
               id="cards"
-              boxesPerRow={5}
-              rowHeight={420}
-              style={{ height: Math.ceil(cards.length / 5) * 420 }}
+              boxesPerRow={Math.floor(windowDimensions.width / 290)}
+              rowHeight={isCondensed ? 320 : 440}
+              style={{
+                // product cards + vertical margins
+                height:
+                  Math.ceil(
+                    displayCards.length /
+                      Math.floor(windowDimensions.width / 290)
+                  ) *
+                    (isCondensed ? 300 : 420) +
+                  Math.ceil(
+                    displayCards.length /
+                      Math.floor(windowDimensions.width / 290)
+                  ) *
+                    20,
+              }}
             >
               {productDetailsArray}
             </GridDropZone>
           </GridContextProvider>
         </div>
+        <div className={classes.paginationBar}>
+          <Typography
+            className={classes.marketPriceLabel}
+            variant="h6"
+            gutterBottom
+          >
+            {selectedFolder.folderName}
+            {` - Market Price: ${formatCurrency(totalMarketPrice)}`}
+          </Typography>
+
+          <Pagination
+            totalProducts={totalProducts}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            handlePageIndexChange={(event, newPage) => {
+              setIsCardsLoading(true);
+              setPageIndex(newPage);
+            }}
+            handlePageSizeChange={(event) => {
+              setIsCardsLoading(true);
+              setPageSize(parseInt(event.target.value, 10));
+              setPageIndex(0);
+            }}
+          />
+        </div>
       </div>
     </>
   );
 }
-
-export default MarketPrices;

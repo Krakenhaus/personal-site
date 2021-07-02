@@ -1,22 +1,25 @@
 package spring.pokemon.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spring.pokemon.client.TCGPlayerClient;
 import spring.pokemon.client.model.TCGProductDetail;
 import spring.pokemon.client.model.TCGSkuPrice;
+import spring.pokemon.client.model.TCGToken;
+import spring.pokemon.data.PriceHistoryRepository;
 import spring.pokemon.data.ProductDetailsRepository;
-import spring.pokemon.data.SkuDetailsRepository;
 import spring.pokemon.data.SkuPricesRepository;
-import spring.pokemon.data.entities.ProductDetails;
-import spring.pokemon.data.entities.SkuDetails;
-import spring.pokemon.data.entities.SkuPrice;
+import spring.pokemon.data.TokenRepository;
+import spring.pokemon.data.entities.*;
+import spring.pokemon.errors.InternalException;
+import spring.pokemon.model.SearchRequest;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ProductService {
     @Autowired
@@ -26,12 +29,44 @@ public class ProductService {
     SkuPricesRepository skuPricesRepository;
 
     @Autowired
-    SkuDetailsRepository skuDetailsRepository;
+    PriceHistoryRepository priceHistoryRepository;
+
+    @Autowired
+    TokenRepository tokenRepository;
 
     @Autowired
     TCGPlayerClient tcgPlayerClient;
 
-    public final static long MILLIS_PER_WEEK = 7 * 24 * 60 * 60 * 1000L;
+    public final static long MILLIS_PER_WEEK = 4 * 7 * 24 * 60 * 60 * 1000L;
+
+    private Token generateNewToken() {
+        TCGToken tcgToken = tcgPlayerClient.generateNewToken();
+        Token token = Token.builder()
+                .accessToken(tcgToken.getAccessToken())
+                .issued(tcgToken.getIssued())
+                .expires(tcgToken.getExpires())
+                .build();
+        tokenRepository.save(token);
+        return token;
+    }
+
+    public List<FolderPriceHistory> getFolderPriceHistory(UUID folderId) {
+        try {
+            return priceHistoryRepository.getFolderPriceHistory(folderId);
+        } catch (Exception ex) {
+            log.error("Sql call failed", ex);
+            throw new InternalException();
+        }
+    }
+
+    public List<PriceHistory> getPriceHistory(Integer skuId) {
+        try {
+            return priceHistoryRepository.findBySkuId(skuId);
+        } catch (Exception ex) {
+            log.error("Sql call failed", ex);
+            throw new InternalException();
+        }
+    }
 
     public List<SkuPrice> getSkuPrices(String skuIds) {
         Set<Integer> skuIdsList = Arrays.stream(skuIds.split("\\s*,\\s*")).filter(item-> !StringUtils.isEmpty(item)).map(Integer::parseInt).collect(Collectors.toSet());
@@ -61,15 +96,24 @@ public class ProductService {
                     .lastUpdateTime(new Date())
                     .build()).collect(Collectors.toList());
 
-            newSkuPrices.forEach(skuPrice -> {
-                skuPricesRepository.save(skuPrice);
-                Optional<SkuDetails> skuDetailsOptional = skuDetailsRepository.findById(skuPrice.getSkuId());
-                skuDetailsOptional.ifPresent(skuPrice::setSkuDetails);
-            });
+            List<PriceHistory> newSkuPriceHistories = tcgSkuPrices.stream().map(tcgSkuPrice -> PriceHistory.builder()
+                    .skuId(tcgSkuPrice.getSkuId())
+                    .lowestListingPriceSnapshot(tcgSkuPrice.getLowestListingPrice())
+                    .marketPriceSnapshot(tcgSkuPrice.getMarketPrice())
+                    .insertTime(new Date())
+                    .build()).collect(Collectors.toList());
+
+            skuPricesRepository.saveAll(newSkuPrices);
+            priceHistoryRepository.saveAll(newSkuPriceHistories);
         }
 
         newSkuPrices.addAll(cachedSkuPrices);
         return newSkuPrices;
+    }
+
+    public List<TCGProductDetail> getSearch(SearchRequest searchRequest) {
+        Set<Integer> matchingProductIds = tcgPlayerClient.productSearch(searchRequest);
+        return tcgPlayerClient.getProductDetails(matchingProductIds, false);
     }
 
     public List<ProductDetails> getProductDetails(String productIds, Boolean includeSkus) {
@@ -93,6 +137,19 @@ public class ProductService {
                         .imageUrl(tcgProductDetail.getImageUrl())
                         .url(tcgProductDetail.getUrl())
                         .build();
+
+                tcgProductDetail.getExtendedData().forEach(extendedData -> {
+                    switch (extendedData.getName()) {
+                        case "Number":
+                            productDetails.setCardNumber(extendedData.getValue());
+                            break;
+                        case "Rarity":
+                            productDetails.setRarity(extendedData.getValue());
+                            break;
+                        case "Card Type":
+                            productDetails.setCardType(extendedData.getValue());
+                    }
+                });
 
                 List<SkuDetails> skuDetails = tcgProductDetail.getSkus().stream().map(tcgSku -> SkuDetails.builder()
                         .skuId(tcgSku.getSkuId())

@@ -10,6 +10,8 @@ export const getDisplayText = (condition) => {
       return "HP";
     case "damaged":
       return "D";
+    default:
+      return "";
   }
 };
 
@@ -25,5 +27,7 @@ export const getColorRepresentation = (condition) => {
       return "#f75b1e";
     case "damaged":
       return "#f7331e";
+    default:
+      return "#000000";
   }
 };
