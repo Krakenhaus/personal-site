@@ -1,17 +1,23 @@
-const USER_ID_KEY = "greg-cards-userid";
+const OKTA_TOKEN = "okta-token-storage";
 
-const getUserId = () => {
-  const userId = localStorage.getItem(USER_ID_KEY);
-  return userId ? userId : "";
+const getOktaToken = () => {
+  const { idToken = "{}" } = localStorage.getItem(OKTA_TOKEN) || {};
+  return JSON.parse(idToken);
 };
 
-const setUserId = (userId) => {
-  localStorage.setItem(USER_ID_KEY, userId);
+const getUserId = () => {
+  const { claims: { UserId = "" } = {} } = getOktaToken();
+  return UserId;
+};
+
+const getFirstName = () => {
+  const { claims: { FirstName = "" } = {} } = getOktaToken();
+  return FirstName;
 };
 
 const LocalStorageApi = {
   getUserId,
-  setUserId,
+  getFirstName,
 };
 
 export default LocalStorageApi;

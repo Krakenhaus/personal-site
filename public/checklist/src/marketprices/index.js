@@ -1,3 +1,3 @@
-import MarketPrices from './MarketPrices'
+import MarketPrices from "./MarketPrices";
 
 export default MarketPrices;

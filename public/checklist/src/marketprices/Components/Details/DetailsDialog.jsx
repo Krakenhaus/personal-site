@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
@@ -8,7 +8,9 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  FormControl,
   IconButton,
+  TextField,
   Typography,
 } from "@material-ui/core";
 import {
@@ -18,13 +20,20 @@ import {
 import ConditionSelect from "./ConditionSelect";
 import PrintingSelect from "./PrintingSelect";
 import FolderChips from "./FolderChips";
+import PriceHistory from "./PriceHistory";
 import { cardTypes, formatCurrency } from "../../utils";
 import { TCGPlayerApi } from "../../Api";
-import { useEffect } from "react";
+import { useCardContext } from "../../CardContext";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: 900,
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    maxWidth: 100,
+    marginBottom: 0,
+    backgroundColor: "white",
   },
   cardConditions: {
     marginBottom: 10,
@@ -40,7 +49,6 @@ const useStyles = makeStyles((theme) => ({
     overflowX: "hidden",
   },
   dialogContent: {
-    display: "flex",
     paddingTop: 0,
     background: (props) => {
       try {
@@ -49,12 +57,19 @@ const useStyles = makeStyles((theme) => ({
       } catch (error) {}
     },
   },
+  dialogContentInner: {
+    display: "flex",
+  },
   lastFetchDate: {
     color: "#999",
   },
   pricing: {
     marginLeft: 8,
     maxWidth: 300,
+  },
+  pricingHistory: {
+    textAlign: "center",
+    width: "100%",
   },
 }));
 
@@ -63,27 +78,35 @@ export default function DetailsDialog({
   isOpen,
   handleClose,
   handleSave,
-  skuDetails,
-  productId,
-  imageUrl,
-  cardType,
-  folderMembership,
-  name,
-  initialSkuId,
-  skuPriceIsDefault,
-  initialSkuPrice,
-  url,
+  index,
 }) {
+  const {
+    state: { displayCards },
+  } = useCardContext();
+
+  const {
+    cardFolders: folderMembership = [],
+    productDetails: { skuDetails = {}, cardType, name, imageUrl, url },
+    skuPrice: initialSkuPrice,
+    cardCount: initialCardCount,
+  } = displayCards ? displayCards[index] : {};
+  const { skuId } = initialSkuPrice || skuDetails[0];
+
   const classes = useStyles({ cardType });
+
   const { conditionId: initialConditionId, printingId: initialPrintingId } =
-    skuDetails.find((skuDetail) => skuDetail.skuId === initialSkuId) || {};
+    skuDetails.find((skuDetail) => skuDetail.skuId === skuId) || {};
 
   const [currentConditionId, setCurrentConditionId] =
     useState(initialConditionId);
   const [currentPrintingId, setCurrentPrintingId] = useState(initialPrintingId);
   const [currentFolderMembership, setCurrentFolderMembership] =
     useState(folderMembership);
-  const [isDirty, setIsDirty] = useState(skuPriceIsDefault);
+  const [currentCardCount, setCurrentCardCount] = useState(
+    initialCardCount || 0
+  );
+  // TODO: is always true?
+  const [isDirty, setIsDirty] = useState(true);
   const [skuPrice, setSkuPrice] = useState(initialSkuPrice);
 
   const availableConditionIds = [
@@ -92,6 +115,8 @@ export default function DetailsDialog({
   const availablePrintingIds = [
     ...new Set(skuDetails.map((skuDetail) => skuDetail.printingId)),
   ];
+
+  // const { skuId } = skuPrice;
 
   useEffect(() => {
     const getNewSkuPrices = async () => {
@@ -119,6 +144,11 @@ export default function DetailsDialog({
     setCurrentPrintingId(newPrintingId);
   };
 
+  const handleCardCountChange = (newCardCount) => {
+    setIsDirty(true);
+    setCurrentCardCount(newCardCount);
+  };
+
   const handleFolderMembershipChange = (newFolders) => {
     const currentFolderNames = currentFolderMembership
       .map((folder) => folder.folderName)
@@ -140,74 +170,101 @@ export default function DetailsDialog({
         </IconButton>
       </DialogTitle>
       <DialogContent className={classes.dialogContent}>
-        <div>
-          <img src={imageUrl} className={classes.cardImage} alt="Card" />
-        </div>
-        <div>
-          <div className={classes.cardConditions}>
-            <PrintingSelect
-              availablePrintingIds={availablePrintingIds}
-              currentPrinting={currentPrintingId}
-              handleChange={handlePrintingIdChange}
-            />
-            <ConditionSelect
-              availableConditionIds={availableConditionIds}
-              currentCondition={currentConditionId}
-              handleChange={handleConditionIdChange}
-            />
-          </div>
-          <Divider />
+        <div className={classes.dialogContentInner}>
           <div>
-            <FolderChips
-              handleFolderMembershipChange={handleFolderMembershipChange}
-              allFolders={allFolders}
-              folderMembership={currentFolderMembership}
-            />
+            <img src={imageUrl} className={classes.cardImage} alt="Card" />
           </div>
+          <div>
+            <div className={classes.cardConditions}>
+              <PrintingSelect
+                availablePrintingIds={availablePrintingIds}
+                currentPrinting={currentPrintingId}
+                handleChange={handlePrintingIdChange}
+              />
+              <ConditionSelect
+                availableConditionIds={availableConditionIds}
+                currentCondition={currentConditionId}
+                handleChange={handleConditionIdChange}
+              />
+            </div>
+            <Divider />
+            <div>
+              <FormControl size="small" className={classes.formControl}>
+                <TextField
+                  size="small"
+                  id="standard-adornment-create-folder"
+                  value={currentCardCount}
+                  onChange={(e) => handleCardCountChange(e.target.value)}
+                  inputProps={{ maxLength: 3 }}
+                  label="Quantity"
+                  variant="outlined"
+                  onFocus={(e) => {
+                    e.preventDefault();
+                    const { target } = e;
+                    target.focus();
+                    target.setSelectionRange(0, target.value.length);
+                  }}
+                />
+              </FormControl>
+              <FolderChips
+                handleFolderMembershipChange={handleFolderMembershipChange}
+                allFolders={allFolders}
+                folderMembership={currentFolderMembership}
+              />
+            </div>
+            <Divider />
+            <div className={classes.pricing}>
+              <div>
+                <span>Market: </span>
+                <Chip
+                  variant="outlined"
+                  label={formatCurrency(marketPrice)}
+                  icon={<LocalAtmIcon />}
+                  style={
+                    marketPrice
+                      ? { fontWeight: 600, color: "#6d9e03", margin: "5px" }
+                      : { color: "#888", margin: "5px" }
+                  }
+                />
+              </div>
+              <div>
+                <span>Lowest: </span>
+                <Chip
+                  variant="outlined"
+                  label={formatCurrency(lowestListingPrice)}
+                  icon={<LocalAtmIcon />}
+                  style={
+                    lowestListingPrice
+                      ? { fontWeight: 600, color: "#6d9e03", margin: "5px" }
+                      : { color: "#888", margin: "5px" }
+                  }
+                />
+              </div>
+              {lastUpdateTime && (
+                <Typography
+                  variant="caption"
+                  display="block"
+                  gutterBottom
+                  className={classes.lastFetchDate}
+                >
+                  Latest pricing data fetched from TCGPlayer.com on{" "}
+                  {new Date(lastUpdateTime).toLocaleDateString("en-US")}.
+                  Pricing is fetched at most once per month.
+                </Typography>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className={classes.pricingHistory}>
           <Divider />
-          <div className={classes.pricing}>
-            <div>
-              <span>Market: </span>
-              <Chip
-                variant="outlined"
-                label={formatCurrency(marketPrice)}
-                icon={<LocalAtmIcon />}
-                style={
-                  marketPrice
-                    ? { fontWeight: 600, color: "#6d9e03", margin: "5px" }
-                    : { color: "#888", margin: "5px" }
-                }
-              />
-            </div>
-            <div>
-              <span>Lowest: </span>
-              <Chip
-                variant="outlined"
-                label={formatCurrency(lowestListingPrice)}
-                icon={<LocalAtmIcon />}
-                style={
-                  lowestListingPrice
-                    ? { fontWeight: 600, color: "#6d9e03", margin: "5px" }
-                    : { color: "#888", margin: "5px" }
-                }
-              />
-            </div>
-            {lastUpdateTime && (
-              <Typography
-                variant="caption"
-                display="block"
-                gutterBottom
-                className={classes.lastFetchDate}
-              >
-                Latest pricing data fetched from TCGPlayer.com on{" "}
-                {new Date(lastUpdateTime).toLocaleDateString("en-US")}. Pricing
-                is fetched at most once per month.
-              </Typography>
-            )}
-          </div>
+          <br />
+          <PriceHistory skuId={skuId} name={name} />
         </div>
       </DialogContent>
       <DialogActions>
+        {/* <Button>Prev</Button>
+        <Button>Next</Button> */}
+
         <Button onClick={handleClose} color="primary">
           Cancel
         </Button>
@@ -226,6 +283,7 @@ export default function DetailsDialog({
             handleSave(isDirty, {
               skuId: newSku.skuId,
               cardFolders: currentFolderMembership,
+              cardCount: currentCardCount,
             });
             handleClose();
           }}

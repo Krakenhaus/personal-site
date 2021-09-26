@@ -1,7 +1,6 @@
-import LocalStorageApi from "./LocalStorageApi";
-
-const getUserId = () => {
-  return LocalStorageApi.getUserId();
+const getUserId = (authState) => {
+  const { idToken: { claims: { UserId: userId } = {} } = {} } = authState || {};
+  return userId;
 };
 
 const getProductDetails = async (productIds) => {
@@ -15,13 +14,14 @@ const getSkuPrices = async (skuIds) => {
 };
 
 const getCardCollection = async (
+  authState,
   sort,
   typeFilter,
   selectedFolder,
   pageSize,
   pageIndex
 ) => {
-  const userId = getUserId();
+  const userId = getUserId(authState);
   if (userId) {
     const { folderName, folderId } = selectedFolder;
     const { sortBy, order } = sort;
@@ -38,18 +38,27 @@ const getCardCollection = async (
   }
 };
 
-const getCardCollectionMarketPrice = async (typeFilter, selectedFolder) => {
+const getCardCollectionMarketPrice = async (
+  authState,
+  typeFilter,
+  selectedFolder
+) => {
   const { folderName, folderId } = selectedFolder;
-  const response = await fetch(
-    `/api/pokemon/users/${getUserId()}/collection/marketPrice?cardType=${
-      typeFilter !== "All" ? typeFilter : ""
-    }&folderId=${folderName !== "All" ? folderId : ""}`
-  );
-  return response.json();
+  const userId = getUserId(authState);
+  if (userId) {
+    const response = await fetch(
+      `/api/pokemon/users/${userId}/collection/marketPrice?cardType=${
+        typeFilter !== "All" ? typeFilter : ""
+      }&folderId=${folderName !== "All" ? folderId : ""}`
+    );
+    return response.json();
+  } else {
+    return "";
+  }
 };
 
-const getFolders = async () => {
-  const userId = getUserId();
+const getFolders = async (authState) => {
+  const userId = getUserId(authState);
   if (userId) {
     const response = await fetch(`/api/pokemon/users/${userId}/folders`);
     return response.json();
@@ -58,18 +67,18 @@ const getFolders = async () => {
   }
 };
 
-const addCardToCollection = async (productId, selectedFolder) => {
-  const userId = getUserId();
+const addCardToCollection = async (authState, productId, selectedFolder) => {
+  const userId = getUserId(authState);
   if (userId) {
     const cardFolders =
       selectedFolder.folderName === "All" ? [] : [selectedFolder];
-    await fetch(`/api/pokemon/users/${getUserId()}/collection`, {
+    await fetch(`/api/pokemon/users/${userId}/collection`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId: getUserId(),
+        userId,
         productId,
         cardFolders,
         count: 1,
@@ -80,72 +89,65 @@ const addCardToCollection = async (productId, selectedFolder) => {
   }
 };
 
-const removeCardFromCollection = async (productId) => {
-  await fetch(
-    `/api/pokemon/users/${getUserId()}/collection/products/${productId}`,
-    {
+const removeCardFromCollection = async (authState, productId) => {
+  const userId = getUserId(authState);
+  if (userId) {
+    await fetch(
+      `/api/pokemon/users/${userId}/collection/products/${productId}`,
+      {
+        method: "DELETE",
+      }
+    );
+  }
+};
+
+const addFolder = async (authState, folderName) => {
+  const userId = getUserId(authState);
+  if (userId) {
+    await fetch(`/api/pokemon/users/${userId}/folders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        folderName,
+      }),
+    });
+  }
+};
+
+const deleteFolder = async (authState, folderId) => {
+  const userId = getUserId(authState);
+  if (userId) {
+    await fetch(`/api/pokemon/users/${userId}/folders/${folderId}`, {
       method: "DELETE",
-    }
-  );
+    });
+  }
 };
 
-const addFolder = async (folderName) => {
-  await fetch(`/api/pokemon/users/${getUserId()}/folders`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      userId: getUserId(),
-      folderName,
-    }),
-  });
-};
-
-const deleteFolder = async (folderId) => {
-  await fetch(`/api/pokemon/users/${getUserId()}/folders/${folderId}`, {
-    method: "DELETE",
-  });
-};
-
-const updateCardInCollection = async (productId, attributes) => {
-  const { skuId, cardFolders, displayOrder } = attributes;
+const updateCardInCollection = async (authState, productId, attributes) => {
+  const { skuId, cardFolders, displayOrder, cardCount } = attributes;
+  const userId = getUserId(authState);
   const filteredCardFolders = cardFolders.filter(
     (cardFolder) => cardFolder.folderName !== "All"
   );
-  await fetch(`/api/pokemon/users/${getUserId()}/collection`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      userId: getUserId(),
-      productId,
-      skuId,
-      cardFolders: filteredCardFolders,
-      displayOrder,
-    }),
-  });
-};
-
-const createUser = async (nickname) => {
-  if (!nickname) {
-    throw new Error("Collection name is required");
+  if (userId) {
+    await fetch(`/api/pokemon/users/${userId}/collection`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: userId,
+        productId,
+        skuId,
+        cardCount,
+        cardFolders: filteredCardFolders,
+        displayOrder,
+      }),
+    });
   }
-
-  const response = await fetch(`/api/pokemon/users`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: nickname,
-  });
-  return response.json();
-};
-
-const getUser = async (userId) => {
-  const response = await fetch(`/api/pokemon/users/${userId}`);
-  return response.json();
 };
 
 const searchProducts = async (productName, setName) => {
@@ -162,17 +164,23 @@ const searchProducts = async (productName, setName) => {
   return response.json();
 };
 
+const getPriceHistory = async (skuId) => {
+  const response = await fetch(
+    `/api/pokemon/products/pricing/skus/${skuId}/history`
+  );
+  return response.json();
+};
+
 const TCGPlayerApi = {
   addCardToCollection,
   addFolder,
-  createUser,
   deleteFolder,
   getCardCollection,
   getCardCollectionMarketPrice,
   getFolders,
+  getPriceHistory,
   getProductDetails,
   getSkuPrices,
-  getUser,
   removeCardFromCollection,
   searchProducts,
   updateCardInCollection,

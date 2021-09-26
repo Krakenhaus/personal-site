@@ -5,7 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>gbalek</groupId>
-<!--    Need to rename, but don't want to deal with that right now-->
+
+    <!-- Need to rename, but don't want to deal with that right now -->
     <artifactId>animalcrossing</artifactId>
     <version>1.0</version>
 
@@ -14,6 +15,11 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.4.0</version>
     </parent>
+
+    <properties>
+        <okta.version>5.0.0</okta.version>
+        <okta.commons.version>1.2.8</okta.commons.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -55,6 +61,37 @@
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.13.Final</version>
         </dependency>
+
+        <!-- BEGIN Okta -->
+        <dependency>
+            <groupId>com.okta.sdk</groupId>
+            <artifactId>okta-sdk-api</artifactId>
+            <version>${okta.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.okta.sdk</groupId>
+            <artifactId>okta-sdk-impl</artifactId>
+            <version>${okta.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.okta.sdk</groupId>
+            <artifactId>okta-sdk-httpclient</artifactId>
+            <version>${okta.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.okta.commons</groupId>
+            <artifactId>okta-config-check</artifactId>
+            <version>${okta.commons.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.okta.commons</groupId>
+            <artifactId>okta-commons-lang</artifactId>
+            <version>${okta.commons.version}</version>
+        </dependency>
+        <!-- END Okta -->
 
     </dependencies>
 

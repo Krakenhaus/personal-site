@@ -47,5 +47,4 @@ public class FolderService {
             throw new InternalException();
         }
     }
-
 }

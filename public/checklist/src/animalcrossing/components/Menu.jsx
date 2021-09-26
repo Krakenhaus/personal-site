@@ -1,7 +1,5 @@
 import React from "react";
 import {
-  AppBar,
-  Button,
   Divider,
   Drawer,
   List,
@@ -9,15 +7,14 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
-  Toolbar,
   Typography,
 } from "@material-ui/core";
-import GitHubIcon from "@material-ui/icons/GitHub";
 import MenuIcon from "@material-ui/icons/Menu";
 import { makeStyles } from "@material-ui/core/styles";
 import Sort from "./Sort";
 import Search from "./Search";
 import Filters from "./Filters";
+import { Menu as SharedMenu } from "../../shared/Components";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -35,9 +32,11 @@ const useStyles = makeStyles((theme) => ({
     width: 250,
   },
   menuTitle: {
+    margin: "auto",
     textAlign: "center",
   },
   title: {
+    margin: "auto",
     flexGrow: 1,
     display: "none",
     [theme.breakpoints.up("sm")]: {
@@ -47,8 +46,6 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbar: {
     backgroundColor: "#f0f0f0",
-    // display: 'flex',
-    // marginLeft: 'auto',
     height: 50,
   },
 }));
@@ -112,38 +109,34 @@ function Menu(props) {
     </div>
   );
 
-  return (
-    <>
+  const DrawerContent = () => {
+    return (
       <Drawer anchor="left" open={state.open} onClose={toggleDrawer(false)}>
         {MenuList}
       </Drawer>
-      <AppBar className={classes.appBar} position="sticky">
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={toggleDrawer(true)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            {pageName}
-          </Typography>
-          <Button
-            href="https://github.com/Krakenhaus/animalcrossing/issues"
-            target="_blank"
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            startIcon={<GitHubIcon />}
-          >
-            Report issues on GitHub
-          </Button>
-          <Search onChangeSearch={onChangeSearch} />
-        </Toolbar>
-      </AppBar>
-    </>
+    );
+  };
+
+  const BarContent = () => {
+    return (
+      <>
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={toggleDrawer(true)}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Typography variant="h6" className={classes.title}>
+          {pageName}
+        </Typography>
+        <Search onChangeSearch={onChangeSearch} />
+      </>
+    );
+  };
+  return (
+    <SharedMenu DrawerContent={DrawerContent()} BarContent={BarContent()} />
   );
 }
 
