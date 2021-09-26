@@ -62,9 +62,25 @@ public class CardCollection implements Serializable {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<CardFolder> cardFolders = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="userId", insertable = false, updatable = false)
-    @JsonIgnore
-    private UserMetadata userMetadata;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name="userId", insertable = false, updatable = false)
+//    @JsonIgnore
+//    private UserMetadata userMetadata;
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CardCollection that = (CardCollection) o;
+
+        return new EqualsBuilder().append(userId, that.userId).append(productId, that.productId).append(skuId, that.skuId).append(cardCount, that.cardCount).append(displayOrder, that.displayOrder).append(productDetails, that.productDetails).append(skuPrice, that.skuPrice).append(cardFolders, that.cardFolders).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(userId).append(productId).append(skuId).append(cardCount).append(displayOrder).append(productDetails).append(skuPrice).append(cardFolders).toHashCode();
+    }
 }

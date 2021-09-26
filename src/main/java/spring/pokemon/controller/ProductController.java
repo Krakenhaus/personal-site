@@ -2,26 +2,25 @@ package spring.pokemon.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import spring.pokemon.client.TCGPlayerClient;
+import org.springframework.web.server.ResponseStatusException;
 import spring.pokemon.client.model.TCGProductDetail;
-import spring.pokemon.data.entities.FolderPriceHistory;
 import spring.pokemon.data.entities.PriceHistory;
 import spring.pokemon.data.entities.ProductDetails;
 import spring.pokemon.data.entities.SkuPrice;
 import spring.pokemon.model.SearchRequest;
 import spring.pokemon.service.ProductService;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/pokemon")
 public class ProductController {
-
-    @Autowired
-    TCGPlayerClient tcgPlayerClient;
 
     @Autowired
     ProductService productService;
@@ -48,9 +47,16 @@ public class ProductController {
         return productService.getPriceHistory(skuId);
     }
 
-    @GetMapping("products/pricing/folders/{folderId}/history")
-    public List<FolderPriceHistory> getFolderPriceHistory(@PathVariable String folderId) {
+    @GetMapping("products/pricing/folders/{folderId}/history/date/{atDate}")
+    public List<BigDecimal> getFolderPriceHistory(@PathVariable String folderId, @PathVariable String atDate) {
         UUID folderIdUUID = UUID.fromString(folderId);
-        return productService.getFolderPriceHistory(folderIdUUID);
+
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyy");
+            Date date = format.parse(atDate);
+            return productService.getFolderPriceHistory(folderIdUUID, date);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date, it must follow the pattern MM-dd-yyyy.");
+        }
     }
 }

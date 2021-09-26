@@ -14,6 +14,7 @@ import spring.pokemon.data.entities.*;
 import spring.pokemon.errors.InternalException;
 import spring.pokemon.model.SearchRequest;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,9 +35,9 @@ public class ProductService {
 
     public final static long MILLIS_PER_MONTH = 4 * 7 * 24 * 60 * 60 * 1000L;
 
-    public List<FolderPriceHistory> getFolderPriceHistory(UUID folderId) {
+    public List<BigDecimal> getFolderPriceHistory(UUID folderId, Date atDate) {
         try {
-            return priceHistoryRepository.getFolderPriceHistory(folderId);
+            return priceHistoryRepository.getFolderPriceHistory(folderId, atDate);
         } catch (Exception ex) {
             log.error("Sql call failed", ex);
             throw new InternalException();

@@ -1,29 +1,13 @@
-import React from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
-import AnimalCrossing from './animalcrossing'
-import Home from './home';
-import MarketPrices from './marketprices'
+import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import AppWithRouterAccess from "./AppWithRouterAccess";
 
-import './App.css';
+import "./App.css";
 
 function App() {
   return (
     <Router>
-        <Switch>
-          <Route path="/animalcrossing">
-            <AnimalCrossing />
-          </Route>
-          <Route path="/tcgmarketprices">
-            <MarketPrices />
-          </Route>
-          <Route path="/">
-            <Home />
-          </Route>
-        </Switch>
+      <AppWithRouterAccess />
     </Router>
   );
 }

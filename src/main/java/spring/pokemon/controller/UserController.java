@@ -1,5 +1,6 @@
 package spring.pokemon.controller;
 
+import com.okta.sdk.resource.user.User;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -7,10 +8,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import spring.pokemon.data.entities.CardCollection;
 import spring.pokemon.data.entities.CardFolder;
-import spring.pokemon.data.entities.UserMetadata;
 import spring.pokemon.data.enums.CardType;
 import spring.pokemon.data.enums.SortBy;
-import spring.pokemon.errors.UserNotFoundException;
+import spring.pokemon.model.UserRequest;
 import spring.pokemon.service.CollectionService;
 import spring.pokemon.service.FolderService;
 import spring.pokemon.service.UserService;
@@ -34,8 +34,8 @@ public class UserController {
     FolderService folderService;
 
     @PostMapping("/users")
-    public UserMetadata createUser(@RequestBody String nickname) {
-        return userService.createUser(nickname);
+    public User createUser(@Valid @RequestBody UserRequest userRequest) {
+        return userService.createUser(userRequest);
     }
 
     @PostMapping(path = "/users/{userId}/collection", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -54,7 +54,12 @@ public class UserController {
         if (pageSize > 50) {
             pageSize = 50;
         }
-        SortBy sortByEnum = SortBy.valueOf(sortBy);
+
+        SortBy sortByEnum = SortBy.marketPrice;
+        if (!StringUtils.isEmpty(sortBy)) {
+            sortByEnum = SortBy.valueOf(sortBy);
+        }
+
         CardType cardTypeEnum = null;
         if (!StringUtils.isEmpty(cardType)) {
             cardTypeEnum = CardType.valueOf(cardType);
@@ -64,17 +69,17 @@ public class UserController {
         return collectionService.getCollection(userIdUUID, cardTypeEnum, folderId, sortByEnum, order, pageSize, pageIndex);
     }
 
-    @GetMapping("users/{userId}")
-    public UserMetadata getUserCollection(@PathVariable String userId) {
-        UUID userIdUUID;
-        try {
-            userIdUUID = UUID.fromString(userId);
-        } catch (Exception ex) {
-            throw new UserNotFoundException();
-        }
-
-        return userService.getUser(userIdUUID);
-    }
+//    @GetMapping("users/{userId}")
+//    public UserMetadata getUserCollection(@PathVariable String userId) {
+//        UUID userIdUUID;
+//        try {
+//            userIdUUID = UUID.fromString(userId);
+//        } catch (Exception ex) {
+//            throw new UserNotFoundException();
+//        }
+//
+//        return userService.getUser(userIdUUID);
+//    }
 
     @GetMapping("users/{userId}/collection/marketPrice")
     public BigDecimal getUserCollectionMarketPrice(@PathVariable String userId, @RequestParam String cardType, @RequestParam String folderId) {

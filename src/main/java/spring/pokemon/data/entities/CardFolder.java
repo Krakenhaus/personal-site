@@ -44,10 +44,11 @@ public class CardFolder implements Serializable {
     @JsonBackReference()
     private List<CardCollection> cardCollection;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="userId", insertable = false, updatable = false)
-    @JsonIgnore
-    private UserMetadata userMetadata;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name="userId", insertable = false, updatable = false)
+//    @JsonIgnore
+//    private UserMetadata userMetadata;
+
 
     @Override
     public boolean equals(Object o) {
@@ -57,11 +58,11 @@ public class CardFolder implements Serializable {
 
         CardFolder that = (CardFolder) o;
 
-        return new EqualsBuilder().append(userId, that.userId).append(folderId, that.folderId).append(folderName, that.folderName).append(color, that.color).append(displayOrder, that.displayOrder).append(cardCollection, that.cardCollection).append(userMetadata, that.userMetadata).isEquals();
+        return new EqualsBuilder().append(userId, that.userId).append(folderId, that.folderId).append(folderName, that.folderName).append(color, that.color).append(displayOrder, that.displayOrder).append(cardCollection, that.cardCollection).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(userId).append(folderId).append(folderName).append(color).append(displayOrder).append(cardCollection).append(userMetadata).toHashCode();
+        return new HashCodeBuilder(17, 37).append(userId).append(folderId).append(folderName).append(color).append(displayOrder).append(cardCollection).toHashCode();
     }
 }

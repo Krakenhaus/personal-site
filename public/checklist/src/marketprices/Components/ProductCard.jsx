@@ -20,7 +20,6 @@ import {
   LocalAtm as LocalAtmIcon,
 } from "@material-ui/icons";
 import DetailsDialog from "./Details";
-import { getColorRepresentation } from "../utils/condition";
 import {
   cardTypes,
   conditionIds,
@@ -28,6 +27,7 @@ import {
   groupIds,
   printingIds,
 } from "../utils";
+import { useCardContext } from "../CardContext";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -144,39 +144,55 @@ const useStyles = makeStyles((theme) => ({
     overflow: "scroll",
     width: 200,
   },
+  cardCount: {
+    color: "#fff",
+    position: "absolute",
+    bottom: "-10px",
+    right: "10px",
+    fontWeight: "bold",
+    fontSize: "15px",
+    textShadow: "0px 0px 4px black",
+  },
 }));
 
 export default function ProductCard({
   allFolders,
-  folderMembership,
-  cardType,
-  productId,
-  name,
-  condition,
-  imageUrl,
-  url,
-  set,
-  skuDetails,
   handleRemoveCard,
   selectedFolder,
-  skuPrice,
   handleProductDetailsChange,
   handleSelectFolder,
-  skuPriceIsDefault,
   isCondensed,
+  index,
 }) {
-  const [isBusy, setIsBusy] = useState(false);
-  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
-  const classes = useStyles({ isBusy, cardType });
-  const conditionStyles = {
-    color: getColorRepresentation(condition),
-    backgroundColor: getColorRepresentation(condition),
-  };
+  const {
+    state: { displayCards },
+  } = useCardContext();
+
+  // Pick apart the context for the needed information
+  const {
+    cardCount = 0,
+    cardFolders: folderMembership = [],
+    productDetails: {
+      skuDetails,
+      cardType,
+      productId,
+      name,
+      imageUrl,
+      groupId: set,
+      url,
+    },
+    skuPrice = {},
+  } = displayCards ? displayCards[index] : {};
+  const skuPriceIsDefault = !skuPrice;
   const {
     lowestListingPrice,
     marketPrice,
     skuId: currentSkuId,
-  } = skuPrice || {};
+  } = skuPrice || skuDetails[0];
+
+  const [isBusy, setIsBusy] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const classes = useStyles({ isBusy, cardType });
 
   const setName = groupIds[set] ? groupIds[set].name : set;
 
@@ -220,6 +236,7 @@ export default function ProductCard({
               window.open(url, "_blank");
             }}
           />
+          <p className={classes.cardCount}>x{cardCount || 0}</p>
         </CardActionArea>
         <CardContent className={classes.cardContent}>
           <div className={classes.typeBar}></div>
@@ -235,7 +252,7 @@ export default function ProductCard({
                     {!skuPriceIsDefault && (
                       <span
                         className={classes.notifyBadge}
-                        style={conditionStyles}
+                        style={{ color: "#666", backgroundColor: "#666" }}
                       />
                     )}
                     {name}
@@ -343,10 +360,11 @@ export default function ProductCard({
             aria-label="delete"
             style={{ marginLeft: "auto" }}
             size="small"
-            onClick={() => {
+            onClick={async () => {
               if (!isBusy) {
                 setIsBusy(true);
-                handleRemoveCard(productId);
+                await handleRemoveCard(productId);
+                setIsBusy(false);
               }
             }}
           >
@@ -358,16 +376,7 @@ export default function ProductCard({
       {detailsDialogOpen && (
         <DetailsDialog
           isOpen={detailsDialogOpen}
-          skuDetails={skuDetails}
-          name={name}
-          imageUrl={imageUrl}
-          productId={productId}
-          folderMembership={folderMembership}
-          initialSkuId={currentSkuId}
           allFolders={allFolders}
-          cardType={cardType}
-          skuPriceIsDefault={skuPriceIsDefault}
-          initialSkuPrice={skuPrice}
           handleSave={async (needsSave, newAttributes) => {
             if (needsSave) {
               setIsBusy(true);
@@ -376,7 +385,7 @@ export default function ProductCard({
             }
           }}
           handleClose={() => setDetailsDialogOpen(false)}
-          url={url}
+          index={index}
         />
       )}
     </>

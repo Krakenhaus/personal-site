@@ -18,20 +18,20 @@ public interface CardCollectionRepository extends PagingAndSortingRepository<Car
     Page<CardCollection> findByUserIdAndCardFoldersFolderId(UUID userId, UUID folderId, Pageable pageable);
     Page<CardCollection> findByUserIdAndProductDetailsCardTypeAndCardFoldersFolderId(UUID userId, String cardType, UUID folderId, Pageable pageable);
 
-    @Query(value = "SELECT sum(sp.market_price) FROM card_collection c INNER JOIN sku_price sp ON sp.sku_id = c.sku_id WHERE user_id= ?1", nativeQuery = true)
+    @Query(value = "SELECT sum(sp.market_price * c.card_count) FROM card_collection c INNER JOIN sku_price sp ON sp.sku_id = c.sku_id WHERE user_id= ?1", nativeQuery = true)
     BigDecimal sumSkuPriceMarketPriceByUserId(UUID userId);
     @Query(value = "SELECT" +
-            " sum(sp.market_price) FROM card_collection c" +
+            " sum(sp.market_price  * c.card_count) FROM card_collection c" +
             " INNER JOIN sku_price sp ON sp.sku_id = c.sku_id" +
             " INNER JOIN product_details pd ON pd.product_id = c.product_id" +
             " WHERE c.user_id = ?1 AND pd.card_type = ?2", nativeQuery = true)
     BigDecimal sumSkuPriceMarketPriceByUserIdAndProductDetailsCardType(UUID userId, String cardType);
-    @Query(value = "SELECT sum(sp.market_price) FROM card_collection c" +
+    @Query(value = "SELECT sum(sp.market_price * c.card_count) FROM card_collection c" +
             " INNER JOIN sku_price sp ON sp.sku_id = c.sku_id" +
             " INNER JOIN card_collection_card_folders cccf ON cccf.card_collection_product_id = c.product_id" +
             " WHERE c.user_id = ?1 AND cccf.card_folders_folder_id = ?2", nativeQuery = true)
     BigDecimal sumSkuPriceMarketPriceByUserIdAndCardFoldersFolderId(UUID userId, UUID folderId);
-    @Query(value = "SELECT sum(sp.market_price) FROM card_collection c" +
+    @Query(value = "SELECT sum(sp.market_price * c.card_count) FROM card_collection c" +
             " INNER JOIN sku_price sp ON sp.sku_id = c.sku_id" +
             " INNER JOIN product_details pd ON pd.product_id = c.product_id" +
             " INNER JOIN card_collection_card_folders cccf ON cccf.card_collection_product_id = c.product_id" +

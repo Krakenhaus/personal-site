@@ -3,15 +3,15 @@ import * as Scroll from "react-scroll";
 import { makeStyles } from "@material-ui/core/styles";
 import { CircularProgress, Typography } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
+import { useOktaAuth } from "@okta/okta-react";
 import {
   CollectionActions,
   Pagination,
   ProductCard,
   Menu,
   SearchDialog,
-  UserIdDialog,
 } from "./Components";
-import { LocalStorageApi, TCGPlayerApi } from "./Api";
+import { TCGPlayerApi } from "./Api";
 import {
   GridContextProvider,
   GridDropZone,
@@ -19,6 +19,11 @@ import {
   swap,
 } from "react-grid-dnd";
 import { cardTypes, formatCurrency } from "./utils";
+import {
+  CardContextProvider,
+  updateCards,
+  useCardContext,
+} from "./CardContext";
 
 import "./marketprices.css";
 
@@ -74,8 +79,22 @@ function getWindowDimensions() {
   };
 }
 
-export default function MarketPrices() {
-  const [displayCards, setDisplayCards] = useState([]);
+const MarketPricesWrapper = () => {
+  return (
+    <CardContextProvider>
+      <MarketPrices />
+    </CardContextProvider>
+  );
+};
+
+const MarketPrices = () => {
+  const {
+    state: { displayCards },
+    dispatch,
+  } = useCardContext();
+  const { oktaAuth, authState } = useOktaAuth();
+
+  // const [displayCards, setDisplayCards] = useState([]);
   const [typeFilter, setTypeFilter] = useState("All");
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState({
@@ -93,7 +112,6 @@ export default function MarketPrices() {
   const [pageIndex, setPageIndex] = useState(0);
   const [totalProducts, setTotalProducts] = useState(0);
   const [isCardsLoading, setIsCardsLoading] = useState(true);
-  const [hasUserId, setHasUserId] = useState(!!LocalStorageApi.getUserId());
   const [error, setError] = useState("");
 
   const [windowDimensions, setWindowDimensions] = useState(
@@ -123,7 +141,8 @@ export default function MarketPrices() {
   const onChange = async (sourceId, sourceIndex, targetIndex, targetId) => {
     try {
       const nextCards = swap(displayCards, sourceIndex, targetIndex);
-      setDisplayCards(nextCards);
+      dispatch(updateCards(nextCards));
+
       // TODO: save order of entire collection at this point - put in save button?
     } catch (error) {
       // tried to drop outside of drop zone
@@ -133,6 +152,7 @@ export default function MarketPrices() {
   const getProductDetails = async () => {
     try {
       const response = await TCGPlayerApi.getCardCollection(
+        authState,
         sort,
         typeFilter,
         selectedFolder,
@@ -145,7 +165,7 @@ export default function MarketPrices() {
       }
 
       setTotalProducts(totalElements);
-      setDisplayCards(content);
+      dispatch(updateCards(content));
       getProductMarketPrice();
 
       scroller.scrollTo("topScrollToElement", {
@@ -156,7 +176,7 @@ export default function MarketPrices() {
         offset: -50,
       });
     } catch (error) {
-      setDisplayCards([]);
+      dispatch(updateCards([]));
       console.log(error);
     } finally {
       setIsCardsLoading(false);
@@ -166,6 +186,7 @@ export default function MarketPrices() {
   const getProductMarketPrice = async () => {
     try {
       const response = await TCGPlayerApi.getCardCollectionMarketPrice(
+        authState,
         typeFilter,
         selectedFolder
       );
@@ -179,7 +200,7 @@ export default function MarketPrices() {
 
   const getAllFolders = async () => {
     try {
-      const response = await TCGPlayerApi.getFolders();
+      const response = await TCGPlayerApi.getFolders(authState);
       setAllFolders(response);
     } catch (error) {
       console.log(error);
@@ -189,16 +210,23 @@ export default function MarketPrices() {
   useEffect(() => {
     getProductDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sort, typeFilter, selectedFolder, pageSize, pageIndex, hasUserId]);
+  }, [sort, typeFilter, selectedFolder, pageSize, pageIndex]);
 
   useEffect(() => {
     getAllFolders();
   }, []);
 
+  if (!authState) return null;
+  const { isAuthenticated } = authState;
+
   const handleAddCard = async (productId) => {
     setIsCardsLoading(true);
     try {
-      await TCGPlayerApi.addCardToCollection(productId, selectedFolder);
+      await TCGPlayerApi.addCardToCollection(
+        authState,
+        productId,
+        selectedFolder
+      );
       await getProductDetails();
     } catch (error) {
       setError(error);
@@ -209,7 +237,7 @@ export default function MarketPrices() {
 
   const handleRemoveCard = async (productId) => {
     setIsCardsLoading(true);
-    await TCGPlayerApi.removeCardFromCollection(productId);
+    await TCGPlayerApi.removeCardFromCollection(authState, productId);
     await getProductDetails();
   };
 
@@ -220,13 +248,13 @@ export default function MarketPrices() {
   };
 
   const handleAddFolder = async (folderName) => {
-    await TCGPlayerApi.addFolder(folderName);
+    await TCGPlayerApi.addFolder(authState, folderName);
     await getAllFolders();
   };
 
   const handleDeleteFolder = async (folderId) => {
     setIsCardsLoading(true);
-    await TCGPlayerApi.deleteFolder(folderId);
+    await TCGPlayerApi.deleteFolder(authState, folderId);
     await getAllFolders();
     await getProductDetails();
   };
@@ -246,7 +274,11 @@ export default function MarketPrices() {
   };
 
   const handleProductDetailsChange = async (productId, newAttributes) => {
-    await TCGPlayerApi.updateCardInCollection(productId, newAttributes);
+    await TCGPlayerApi.updateCardInCollection(
+      authState,
+      productId,
+      newAttributes
+    );
     await getProductDetails();
   };
 
@@ -256,40 +288,13 @@ export default function MarketPrices() {
     setTypeFilter(newFilter);
   };
 
-  const productDetailsArray = displayCards.map((card) => {
-    const {
-      productDetails: {
-        skuDetails,
-        cardType,
-        productId,
-        name,
-        imageUrl,
-        groupId,
-        url,
-      },
-      skuPrice,
-      cardFolders: folderMembership = [],
-    } = card;
-
-    const skuPriceIsDefault = !skuPrice;
-    const defaultedSkuPrice = skuPrice || skuDetails[0];
-
+  const productDetailsArray = displayCards.map((card, index) => {
     return (
-      <GridItem key={productId}>
+      <GridItem key={index}>
         <ProductCard
+          index={index}
           allFolders={allFolders}
-          folderMembership={folderMembership}
-          cardType={cardType}
-          productId={productId}
-          name={name}
-          imageUrl={imageUrl}
-          set={groupId}
-          url={url}
           selectedFolder={selectedFolder}
-          skuDetails={skuDetails}
-          skuPrice={defaultedSkuPrice}
-          skuPriceIsDefault={skuPriceIsDefault}
-          condition="near_mint"
           handleRemoveCard={handleRemoveCard}
           handleProductDetailsChange={handleProductDetailsChange}
           handleSelectFolder={handleSelectFolder}
@@ -314,15 +319,6 @@ export default function MarketPrices() {
           <div className={classes.cardsLoading}>
             <CircularProgress size={100} color="inherit" />
           </div>
-        )}
-        {!hasUserId && (
-          <UserIdDialog
-            isOpen={!hasUserId}
-            handleClose={() => {
-              setIsCardsLoading(true);
-              setHasUserId(true);
-            }}
-          />
         )}
         {searchDialogOpen && (
           <SearchDialog
@@ -398,4 +394,6 @@ export default function MarketPrices() {
       </div>
     </>
   );
-}
+};
+
+export default MarketPricesWrapper;

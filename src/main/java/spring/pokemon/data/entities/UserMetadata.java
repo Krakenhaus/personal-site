@@ -1,18 +1,15 @@
 package spring.pokemon.data.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.UUID;
 
 @Getter
@@ -29,23 +26,23 @@ public class UserMetadata {
     private UUID userId;
     private String nickname;
 
-    @OneToMany(
-            mappedBy = "userMetadata",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @JsonBackReference()
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<CardCollection> cardCollection;
+//    @OneToMany(
+//            mappedBy = "userMetadata",
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true
+//    )
+//    @JsonBackReference()
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+//    private List<CardCollection> cardCollection;
 
-    @OneToMany(
-            mappedBy = "userMetadata",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @JsonBackReference()
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<CardFolder> cardFolders;
+//    @OneToMany(
+//            mappedBy = "userMetadata",
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true
+//    )
+//    @JsonBackReference()
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+//    private List<CardFolder> cardFolders;
 
     @Override
     public boolean equals(Object o) {
@@ -55,11 +52,11 @@ public class UserMetadata {
 
         UserMetadata that = (UserMetadata) o;
 
-        return new EqualsBuilder().append(userId, that.userId).append(nickname, that.nickname).append(cardCollection, that.cardCollection).append(cardFolders, that.cardFolders).isEquals();
+        return new EqualsBuilder().append(userId, that.userId).append(nickname, that.nickname).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(userId).append(nickname).append(cardCollection).append(cardFolders).toHashCode();
+        return new HashCodeBuilder(17, 37).append(userId).append(nickname).toHashCode();
     }
 }
